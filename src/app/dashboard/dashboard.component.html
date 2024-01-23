@@ -1,13 +1,14 @@
-<p>dashboard works!</p>
-
 <div class="dashboard-page grid grid-cols-3">
-	<div class="person-bar">
-
+	<div class="person-bar flex">
+		<p>{{ person.name }}</p>
 	</div>
 	<div class="group-bar">
-
+		<div *ngIf="n_groups > 0; then list_groups else empty_groups">Test Test Test</div>
+		<ng-template #list_groups><p>At least one group</p></ng-template>
+		<ng-template #empty_groups><p>No groups</p></ng-template>
 	</div>
 	<div class="balance-bar">
-
+		Balance
 	</div>
 </div>
+<!-- <router-outlet></router-outlet> -->
