@@ -1,14 +1,42 @@
 <div class="dashboard-page grid grid-cols-3">
 	<div class="person-bar flex">
 		<p>{{ person.name }}</p>
+
+		<div class="friends-label place-content-center grid grid-flow-row">
+			...
+		</div>
+		<div class="friends-container place-content-center grid grid-flow-row">
+			<div *ngIf="n_friends > 0; then list_friends else empty_friends"></div>
+			<ng-template #list_friends>
+				<p>At least one group</p>
+				<div *ngFor="let friend in friends">
+					<div class="friend-item">{{friend.name}}</div>
+				</div>
+			</ng-template>
+			<ng-template #empty_friends><p>Add a friend!</p></ng-template>
+		</div>
+		<div class="recent-friend-label" *ngIf="n_friends > 0">
+			...
+		</div>
 	</div>
-	<div class="group-bar">
-		<div *ngIf="n_groups > 0; then list_groups else empty_groups">Test Test Test</div>
+	<div class="group-bar place-content-center grid grid-flow-row">
+		<div *ngIf="n_groups > 0; then list_groups else empty_groups"></div>
 		<ng-template #list_groups><p>At least one group</p></ng-template>
 		<ng-template #empty_groups><p>No groups</p></ng-template>
+		
+		<div>
+			<button mat-fab extended>
+				<mat-icon>Home</mat-icon>
+				New
+			</button>
+		</div>
+
+		<div>
+			No groups yet...
+		</div>
 	</div>
-	<div class="balance-bar">
-		Balance
+	<div class="balance-bar" [ngClass]="{'red': person.balance > 0, 'green': person.balance < 0, 'grey': person.balance == 0}">
+		Balance: {{ person.balance }}
 	</div>
 </div>
 <!-- <router-outlet></router-outlet> -->
