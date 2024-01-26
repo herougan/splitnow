@@ -1,6 +1,6 @@
-<div class="dashboard-page grid grid-cols-3">
-	<div class="person-bar flex">
-		<p>{{ person.name }}</p>
+<div class="dashboard-page flex">
+	<div class="person-bar flex flex-col items-center">
+		<div><p>{{ person.name }}</p></div>
 
 		<div class="friends-label place-content-center grid grid-flow-row">
 			...
@@ -19,14 +19,17 @@
 			...
 		</div>
 	</div>
-	<div class="group-bar place-content-center grid grid-flow-row">
+	<div class="group-bar flex flex-col place-content-center items-center">
 		<div *ngIf="n_groups > 0; then list_groups else empty_groups"></div>
-		<ng-template #list_groups><p>At least one group</p></ng-template>
-		<ng-template #empty_groups><p>No groups</p></ng-template>
+		<ng-template #list_groups>
+			<div><p>At least one group</p></div>
+		</ng-template>
+		<ng-template #empty_groups>
+			<div><p>No groups</p></div>
+		</ng-template>
 		
-		<div>
+		<div class="new-group-button">
 			<button mat-fab extended>
-				<mat-icon>Home</mat-icon>
 				New
 			</button>
 		</div>
@@ -35,8 +38,8 @@
 			No groups yet...
 		</div>
 	</div>
-	<div class="balance-bar" [ngClass]="{'red': person.balance > 0, 'green': person.balance < 0, 'grey': person.balance == 0}">
-		Balance: {{ person.balance }}
+	<div class="balance-bar flex-col" [ngClass]="{'red': person.balance > 0, 'green': person.balance < 0, 'grey': person.balance == 0}">
+		Balance: {{ person.balance | accountingFormat }}
 	</div>
 </div>
 <!-- <router-outlet></router-outlet> -->
