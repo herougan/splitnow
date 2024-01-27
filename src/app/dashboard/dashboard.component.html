@@ -1,45 +1,73 @@
 <div class="dashboard-page flex">
-	<div class="person-bar flex flex-col items-center">
-		<div><p>{{ person.name }}</p></div>
+	<!-- ===== Person Bar ===== -->
+	<div class="dashboard__person-bar flex flex-col">
+		<!-- === Title === -->
+		<div class="dashboard__person-title">{{ person.name }}</div>
+		<!-- === Content === -->
+		<div class="dashboard__person-content flex flex-col place-content-center items-center">
 
-		<div class="friends-label place-content-center grid grid-flow-row">
-			...
+			<div class="dashboard__friends-container flex place-content-center">
+				<div *ngIf="n_friends > 0; then list_friends else empty_friends"></div>
+				<ng-template #list_friends>
+					<p>At least one group</p>
+					<div *ngFor="let friend in friends">
+						<div class="dashboard__friend-item">{{friend.name}}</div>
+					</div>
+				</ng-template>
+				<ng-template #empty_friends>
+					<div class="place-self-center">Add a friend!</div>
+				</ng-template>
+			</div>
+
+			<div class="dashboard__recent-friend-label" *ngIf="n_friends > 0">
+				Recent activity
+			</div>
+			<div class="dashboard__recent-container">
+				
+			</div>
 		</div>
-		<div class="friends-container place-content-center grid grid-flow-row">
-			<div *ngIf="n_friends > 0; then list_friends else empty_friends"></div>
-			<ng-template #list_friends>
-				<p>At least one group</p>
-				<div *ngFor="let friend in friends">
-					<div class="friend-item">{{friend.name}}</div>
+	</div>
+	<!-- ===== Group Bar ===== -->
+	<div class="dashboard__group-bar flex flex-col">
+		<!-- === Title === -->
+		<div class="dashboard__group-title">Groups</div>
+		<!-- === Content === -->
+		<div class="dashboard__group-content flex flex-col place-content-around items-center">
+			<ng-container *ngIf="n_groups <= 0" class="dashboard__group-content-inner">
+				<div>No groups yet...</div>
+				<div class="dashboard__group-new">
+					<button mat-fab extended>
+						New
+					</button>
 				</div>
-			</ng-template>
-			<ng-template #empty_friends><p>Add a friend!</p></ng-template>
-		</div>
-		<div class="recent-friend-label" *ngIf="n_friends > 0">
-			...
-		</div>
-	</div>
-	<div class="group-bar flex flex-col place-content-center items-center">
-		<div *ngIf="n_groups > 0; then list_groups else empty_groups"></div>
-		<ng-template #list_groups>
-			<div><p>At least one group</p></div>
-		</ng-template>
-		<ng-template #empty_groups>
-			<div><p>No groups</p></div>
-		</ng-template>
-		
-		<div class="new-group-button">
-			<button mat-fab extended>
-				New
-			</button>
-		</div>
+			</ng-container>
+			<ng-container *ngIf="n_groups > 0 && n_groups <= 3" class="dashboard__group-content-inner">
+				<div><p>At least one group</p></div>
+				<div class="dashboard__group-new">
+					<button mat-fab extended>
+						New
+					</button>
+				</div>
+			</ng-container>
+			<ng-container *ngIf="n_groups > 3" class="dashboard__group-content-inner">
+				<div *ngFor="let group in groups">
 
-		<div>
-			No groups yet...
+				</div>
+				<div>Groups...</div>
+				<div class="dashboard__group-new">
+					<button mat-fab extended>
+						New
+					</button>
+				</div>
+			</ng-container>
 		</div>
 	</div>
-	<div class="balance-bar flex-col" [ngClass]="{'red': person.balance > 0, 'green': person.balance < 0, 'grey': person.balance == 0}">
+	<!-- ===== Balance Bar ===== -->
+	<div class="dashboard__balance-bar flex-col" [ngClass]="{'red': person.balance > 0, 'green': person.balance < 0, 'grey': person.balance == 0}">
+		<!-- === Title === -->
 		Balance: {{ person.balance | accountingFormat }}
+		<!-- === Content === -->
+		<div class="dashboard__balance-content flex flex-col place-content-center items-center"></div>
 	</div>
 </div>
 <!-- <router-outlet></router-outlet> -->

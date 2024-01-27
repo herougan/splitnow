@@ -3,9 +3,14 @@ import { User } from "./user";
 
 export interface Group {
 	
+	// == Main ==
 	id: number;
 	users: User[];
 	transactions: Transaction[];
+
+	// == Meta ==
+	date: Date;
+	deleted: Boolean;
 	
 	// (user: User): number;
 

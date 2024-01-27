@@ -3,30 +3,79 @@
 @tailwind utilities
 
 // Colours
-$grey: rgba(250, 150, 150, 1)
-	
+$white: #F9F7F3
+$light: #B5E2FA
+$primary: #0FA3B1
+$light_secondary: #EDDEA4
+$secondary: #F7A072
+//
+$red-text: #00ae17
+$green-text: #c80000
+$neutral-text: #0a002a
+
 .dashboard-page
 	margin-top: 5vh
 	height: 95vh
+	background-color: $white
 
-.person-bar
+/* Person bar Left */
+.dashboard__person-bar
 	width: 30vw
 
-.group-bar
+.dashboard__person-title
+	margin-bottom: 5vh
+
+.dashboard__friends-container
+	height: 40vh
+	width: 20vw
+	border-radius: 10px
+	background-color: $light
+
+	margin-bottom: 5vh
+
+.dashboard__recent-container
+	height: 30vh
+	width: 20vw
+	border-radius: 10px
+	background-color: $primary
+
+/* Group bar Middle */
+.dashboard__group-title
+	margin-bottom: 5vh
+	
+.dashboard__group-bar
 	width: 40vw
 	height: 100%
 
-.balance-bar
-	width: 30vw
+.dashboard__group-new
+	border-radius: 25px
+	height: 50px
+	width: 50px
+	background-color: $light
+	text-align: center
+	justify-content: center
+	display: flex
 
-.friends-container
-	height: 50vh
-	width: 20vw
-	border-radius: 10px
-	background-color: $grey
+.dashboard__group-content
+	height: 20vh
 
-.new-group-button
-	border-radius: 15px
-	height: 30px
-	width: 30px
-	background-color: $grey
+.dashboard__group-content-inner 
+	height: 20vh
+
+/* Balance bar Right */
+.dashboard__balance-title
+	margin-bottom: 5vh
+
+.dashboard__balance-bar
+	width: 30v
+
+
+/* Colour Toggle */
+.red
+	colour: $red-text
+
+.green
+	colour: $green-text
+
+.neutral
+	colour: $neutral-text
