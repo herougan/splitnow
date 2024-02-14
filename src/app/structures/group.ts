@@ -1,16 +1,16 @@
 import { Transaction } from "./transaction";
 import { User } from "./user";
 
-export interface Group {
+export class Group {
 	
 	// == Main ==
-	id: number;
-	users: User[];
-	transactions: Transaction[];
+	// id: number;
+	// users: User[];
+	// transactions: Transaction[];
 
-	// == Meta ==
-	date: Date;
-	deleted: Boolean;
+	// // == Meta ==
+	// date: Date;
+	// deleted?: Boolean;
 	
 	// (user: User): number;
 
@@ -32,4 +32,14 @@ export interface Group {
 	// 	return;
 	// }
 	// /* === CRUD Groups === */
+
+	constructor(
+		public id: number,
+		public name: string,
+		public users: User[] = [],
+		public transactions: Transaction[] = [],
+
+		public date: Date = new Date(),
+		public deleted: Boolean = false,
+	) {	}
 }

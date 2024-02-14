@@ -1,0 +1,64 @@
+[Splitter's Journey]
+Put friend-search into a sub-component: determine if friend bar and group bar can share into
+
+
+Friend 	-> Add First Friend -> Add Friends 													// Not key, making a first group is key.
+		-> Add Friends
+		-> Max Friends
+
+Group	-> Create First Group |	->	Friend		...
+		-> Create New Group   |					+	-> Max Group Members
+																			*	-> Premium
+								-> Max Groups
+												*	-> Premium
+
+Selected Group	->	Create Another Group
+								-> Max Groups
+												*	-> Premium
+				->	Add Another friend		->	Existing
+											->	New
+				->	Add friend (on the side)
+
+				->	Select Transaction
+
+				->	Add Transaction
+
+				->	Add first friend 															// User deleted all his friends
+				
+
+Selected User	->	Profile		-> Change Name
+								-> Change Profile pic
+
+
+
+Selected Friend	->	Delete Friend
+
+
+
+
+Selected Group Extra	->	Send Breakdown
+
+
+
+Everything uses the same "in-memory-service" or store that jay-coffee-test uses.
+
+// Note:
+
+First UX should only have the central pillar. enlarged
+'
+'
+
+// Add friend in group VERSUS add friend to account
+// Go social tab?
+// Dashboard tab
+// Context actions
+// Buttons to work
+// Adding and removing transactions
+// Going in and out of groups
+
+// Left navtab animates in and out on pull; middle tab gains more space
+// Introduce fade and ng-show=""
+
+// Default currency
+// For all others, use currency shown
+// Choose exchange rates for finalisation

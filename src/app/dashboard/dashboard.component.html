@@ -1,25 +1,80 @@
-<div class="dashboard-page flex">
+<div class="dashboard-page__container flex justify-center">
+<div class="dashboard-page flex justify-center">
+
+	<!-- ===== Sidebar ===== -->
+	<div class="dashboard__sidebar flex flex-col">
+		<div>
+			<div class="dashboard__friends">
+	
+			</div>
+			<div class="dashboard__profile">
+	
+			</div>
+			<div class="dashboard__setting">
+	
+			</div>
+			<div class="dashboard__groups">
+	
+			</div>
+			<div class="dashboard__statistics">
+	
+			</div>
+		</div>
+	</div>
+
 	<!-- ===== Person Bar ===== -->
 	<div class="dashboard__person-bar flex flex-col">
 		<!-- === Title === -->
 		<div class="dashboard__person-title">{{ person.name }}</div>
 		<!-- === Content === -->
-		<div class="dashboard__person-content flex flex-col place-content-center items-center">
+		<div *ngIf="groups.length > 0" class="dashboard__person-content flex flex-col place-content-center items-center">
 
-			<div class="dashboard__friends-container flex place-content-center">
-				<div *ngIf="n_friends > 0; then list_friends else empty_friends"></div>
-				<ng-template #list_friends>
-					<p>At least one group</p>
-					<div *ngFor="let friend in friends">
-						<div class="dashboard__friend-item">{{friend.name}}</div>
+			<div class="dashboard__friends-label">Friends</div>
+
+			<div class="dashboard__friends-container flex flex-col">
+				<div *ngIf="friends.length > 0; then list_friends else empty_friends"></div>
+				<!-- No friends -->
+				<ng-template #empty_friends>
+					<div class="flex flex-col place-content-center">
+						<div class="dashboard__friends-empty-add-new place-self-center">
+							<input type="text" class="form-control" id="name"
+							required placeholder="Add a new friend!"
+							onforminput="newFriendCreateContext"
+							[(ngModel)]="newFriendTemp.name" name="name">
+						</div>
+						<div *ngIf="newFriendTemp.name != ''" class="dashboard__friends-empty-add-new-context flex flex-col place-items-center">
+							<div class="add-friend-context">Add "{{newFriendTemp.name}}"</div>
+							<div class="add-friend-context" *ngFor="let result of friendSearchResults">
+									{{result.name}}
+							</div>
+						</div>
 					</div>
 				</ng-template>
-				<ng-template #empty_friends>
-					<div class="place-self-center">Add a friend!</div>
+
+				<!-- At least one friend -->
+				<ng-template #list_friends>
+					<div *ngFor="let friend of friends">
+						<div class="dashboard__friend-item">{{friend.name}}</div>
+					</div>
+					<div>Add another friend...</div>
+					<div class="flex flex-col place-content-center">
+						<div class="dashboard__friends-empty-add-new place-self-center">
+							<input type="text" class="form-control" id="name"
+							required placeholder="Add a new friend!"
+							onforminput="newFriendCreateContext"
+							[(ngModel)]="newFriendTemp.name" name="name">
+						</div>
+						<div *ngIf="newFriendTemp.name != ''" class="dashboard__friends-empty-add-new-context flex flex-col place-items-center">
+							<div class="add-friend-context">Add "{{newFriendTemp.name}}"</div>
+							<div class="add-friend-context" *ngFor="let result of friendSearchResults">
+									{{result.name}}
+							</div>
+						</div>
+					</div>
 				</ng-template>
 			</div>
 
-			<div class="dashboard__recent-friend-label" *ngIf="n_friends > 0">
+			<div class="dashboard__recent-friend-label" *ngIf="friends.length > 0">
 				Recent activity
 			</div>
 			<div class="dashboard__recent-container">
@@ -27,47 +82,160 @@
 			</div>
 		</div>
 	</div>
-	<!-- ===== Group Bar ===== -->
+
+	<!-- ===== Group/Transactions Bar ===== -->
 	<div class="dashboard__group-bar flex flex-col">
 		<!-- === Title === -->
 		<div class="dashboard__group-title">Groups</div>
 		<!-- === Content === -->
 		<div class="dashboard__group-content flex flex-col place-content-around items-center">
-			<ng-container *ngIf="n_groups <= 0" class="dashboard__group-content-inner">
-				<div>No groups yet...</div>
-				<div class="dashboard__group-new">
-					<button mat-fab extended>
-						New
-					</button>
-				</div>
+			<!-- Default Create New  -->
+			<ng-container *ngIf="groups.length <= 0" class="dashboard__group-content-inner">
+				<form #groupForm="ngForm">
+					<div class="dashboard__group-new-form flex flex-col place-content-center space-y-5">
+						<div class="dashboard__group-new-form-label">What is your group's name?</div>
+						<div class="dashboard__friends-empty-add-new place-self-center">
+							<input type="text" class="form-control" id="name"
+							required placeholder="Enter name..."
+							onforminput="newGroupCreateContext"
+							[(ngModel)]="newGroupTemp.name" name="name">
+						</div>
+						<div class="dashboard__group-empty-add-new-context flex flex-col place-items-center">
+							<button type="submit" id="new_group" class="bg-cyan-500 rounded py-2 px-3 text-white cyan-button" [ngClass]="{'btn-disabled': newGroupTemp.name == ''}" [disabled]="newGroupTemp.name == ''">
+								Start Sharing!
+							</button>
+						</div>
+						<div class="text-cyan-500 cyan-title">
+							Or join an existing splitgroup!
+						</div>
+					</div>
+				</form>
+				<form #groupForm2="ngForm">
+					<div class="dashboard__group-empty-new-form__two flex flex-col place-content-center items-center space-y-5">
+						<div class="dashboard__group-empty-new-form__two-label">Add the members of your group</div>
+						<div class="dashboard__group-empty-new-form__two-input place-self-center">
+							<input type="text" class="form-control" id="name"
+							required placeholder="Name or Email"
+							onforminput="newFriendCreateContext"
+							[(ngModel)]="newFriendTemp.name" name="name">
+						</div>
+						<div class="text-cyan-500 cyan-title">
+							Add an existing user
+						</div>
+						<!-- <div>
+							Invite users from facebook!
+						</div> -->
+						<!-- <div>Add {{groupForm2.form.name.text}}</div>
+						<div>Add email {{groupForm2.form.name.text}}</div> -->
+						<!-- <div *ngFor="let result of friendSearchResults">
+
+						</div>
+						<div>
+							<div *ngFor="let member of newGroupTemp.members">
+								<tr *ngFor="let result of friendSearchResults;let i = index">
+								   <td><input name="staff.{{i}}.name" [(ngModel)]="staff.name">{{staff.name}}</td>
+								</tr>
+							</div>
+						</div>
+						<div class="dashboard__group-empty-new-form__two-context flex flex-col place-items-center">
+							
+						</div> -->
+						<div>
+							<button type="submit" class="bg-cyan-500 rounded py-2 px-3 text-white cyan-button">
+								Create group!
+							</button>
+						</div>
+					</div>
+				</form>
+				<!-- Are you sure you want to build an empty group? -->
+				<form>
+					<div>
+						Are you sure you want to create an empty group?
+					</div>
+					<div>
+						<button type="submit" class="bg-cyan-500 rounded py-2 px-3 text-white cyan-button">
+							Yes
+						</button>
+						<button type="submit" class="bg-cyan-500 rounded py-2 px-3 text-white cyan-button">
+							Cancel
+						</button>
+					</div>
+				</form>
 			</ng-container>
-			<ng-container *ngIf="n_groups > 0 && n_groups <= 3" class="dashboard__group-content-inner">
+			<!-- If <= 0 n_groups, default page is "create a new group" -->
+			<!-- Create a new group page: 
+				select a name
+				if <= 0 friends, default page is "create a new friend" -->
+			<!-- New Button -->
+			<!-- <ng-container *ngIf="nGroups > 0 && nGroups <= 3" class="dashboard__group-content-inner">
 				<div><p>At least one group</p></div>
 				<div class="dashboard__group-new">
-					<button mat-fab extended>
+					<button class="dashboard__group-new-group" type="button" mat-fab extended (click)="newGroup()">
 						New
 					</button>
 				</div>
-			</ng-container>
-			<ng-container *ngIf="n_groups > 3" class="dashboard__group-content-inner">
-				<div *ngFor="let group in groups">
-
+			</ng-container> -->
+			<ng-container *ngIf="groups.length > 0" class="dashboard__group-content-inner">
+				<div *ngFor="let group of groups">
+					{{group|json}}
 				</div>
-				<div>Groups...</div>
 				<div class="dashboard__group-new">
-					<button mat-fab extended>
+					<button class="dashboard__group-new-group" type="button" mat-fab extended (click)="newGroup()">
 						New
 					</button>
 				</div>
+				<div *ngIf="editGroupFlag">
+					<app-new-group-form search></app-new-group-form>
+				</div>
 			</ng-container>
+
+			<div class="transactions flex flex-col">
+				<div class="transaction bg-sky-500 rounded m-1">
+					<div class="transaction-name">Transaction 1</div>
+					<div class="transaction-owner-img"></div>
+					<div class="transaction-amount">50</div>
+				</div>
+				<div class="transaction bg-sky-500 rounded m-1">
+					<div class="transaction-name">Transaction 2</div>
+					<div class="transaction-owner-img"></div>
+					<div class="transaction-amount">50</div>
+				</div>
+				<div class="transaction bg-sky-500 rounded m-1">
+					<div class="transaction-name">Transaction 3</div>
+					<div class="transaction-owner-img"></div>
+					<div class="transaction-amount">50</div>
+				</div>
+				<div class="transaction bg-sky-500 rounded m-1">
+					<div class="transaction-name">Transaction 4</div>
+					<div class="transaction-owner-img"></div>
+					<div class="transaction-amount">50</div>
+				</div>
+			</div>
+
+			<!-- === New Group Form === -->
 		</div>
 	</div>
+
+	<!-- === Tooltips === -->
+	<div *ngIf="false">
+		Add someone's email to sign him up? (What does this do for him #1)
+		And #2 what do I get. Why can't I just use his name?
+	</div>
+
 	<!-- ===== Balance Bar ===== -->
 	<div class="dashboard__balance-bar flex-col" [ngClass]="{'red': person.balance > 0, 'green': person.balance < 0, 'grey': person.balance == 0}">
 		<!-- === Title === -->
 		Balance: {{ person.balance | accountingFormat }}
 		<!-- === Content === -->
 		<div class="dashboard__balance-content flex flex-col place-content-center items-center"></div>
+
+		<!-- === New Button === -->
+		<div *ngIf="newGroupFlag">
+			<button class="dashboard__balance-new-group" type="button" mat-fab extended (click)="newGroup()">
+
+			</button>
+		</div>
 	</div>
+</div>
 </div>
 <!-- <router-outlet></router-outlet> -->

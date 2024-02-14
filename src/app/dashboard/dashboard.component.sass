@@ -2,21 +2,18 @@
 @tailwind components
 @tailwind utilities
 
-// Colours
-$white: #F9F7F3
-$light: #B5E2FA
-$primary: #0FA3B1
-$light_secondary: #EDDEA4
-$secondary: #F7A072
-//
-$red-text: #00ae17
-$green-text: #c80000
-$neutral-text: #0a002a
+@import "../../common"
 
 .dashboard-page
-	margin-top: 5vh
-	height: 95vh
+	height: 100vh
+	width: 100vw
+
+.dashboard-page__container 
 	background-color: $white
+
+/* Dashboard Sidebar */
+.dashboard__sidebar
+	width: 50px
 
 /* Person bar Left */
 .dashboard__person-bar
@@ -39,6 +36,19 @@ $neutral-text: #0a002a
 	border-radius: 10px
 	background-color: $primary
 
+.dashboard__friends-empty-add-new
+	width: 10vw
+
+	input
+		width: 10vw
+
+.dashboard__friends-empty-add-new-context
+	position: absolute
+
+.add-friend-context
+	width: 10vw
+	background-color: $white
+
 /* Group bar Middle */
 .dashboard__group-title
 	margin-bottom: 5vh
@@ -57,17 +67,33 @@ $neutral-text: #0a002a
 	display: flex
 
 .dashboard__group-content
-	height: 20vh
+	// height: 20vh
 
 .dashboard__group-content-inner 
 	height: 20vh
+
+.dashboard__group-empty-add-new
+	width: 10vw
+
+	input
+		width: 10vw
+
+.add-group-context
+	width: 10vw
+	background-color: $white
+
+.dashboard__group-add-new-context
+	position: absolute
+
+.dashboard__group-empty-new-form__two-context
+	position: absolute
 
 /* Balance bar Right */
 .dashboard__balance-title
 	margin-bottom: 5vh
 
 .dashboard__balance-bar
-	width: 30v
+	width: 30vw
 
 
 /* Colour Toggle */
@@ -79,3 +105,35 @@ $neutral-text: #0a002a
 
 .neutral
 	colour: $neutral-text
+
+/* Transactions */
+
+.transaction-owner-img
+	height: 50px
+	width: 50px
+
+.transaction
+	display: flex
+	flex-direction: row
+	align-items: center
+	padding: 10px
+	height: 30px
+
+/* Debug */
+.dashboard__group-title
+	border: 1px solid red
+
+.dashboard__group-content
+	border: 1px solid red
+
+.dashboard__person-bar
+	border: 1px solid blue
+
+.dashboard__group-bar
+	border: 1px solid blue
+
+.dashboard__balance-bar
+	border: 1px solid blue
+
+.dashboard__sidebar
+	border: 1px solid blue

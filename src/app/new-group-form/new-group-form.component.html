@@ -1,0 +1,41 @@
+<div>
+	{{ model | json }}
+	
+	<div class="newGroupForm" *ngIf="activated">
+		<div class="form-group">
+			<label for="name">Name</label>
+			<input type="text" class="form-control" id="name"
+				   required
+				   [(ngModel)]="model.name" name="name"
+				   #name="ngModel">
+			Name is required
+		</div>
+		
+		<div class="form-group">
+			<label for="transaction">Transactions</label>
+			<div *ngFor="let transaction of model.transactions">
+				{{transaction | json}}
+			</div>
+			<!-- <select class="form-control" id="transaction"
+					required
+					[(ngModel)]="model.transactions" name="transactions"
+					#transaction="ngModel">
+			  <option *ngFor="let transaction of transactions" [value]="transaction">{{transaction}}</option>
+			</select>
+			<div [hidden]="transaction.valid || transaction.pristine" class="alert alert-danger">
+			  Transactions are required
+			</div> -->
+		</div>
+		
+		<div class="form-group">
+			<label for="member">Members</label>
+			<div *ngFor="let user of model.users">
+				{{user | json}}
+			</div>
+		</div>
+	</div>
+
+	<div class="newGroup__addPeopleSection" *ngIf="activated && activated__addPeople">
+		
+	</div>
+</div>

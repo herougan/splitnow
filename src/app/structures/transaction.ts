@@ -1,35 +1,35 @@
-export interface Transaction {
+export class Transaction {
+	
+	constructor(
+		public message: string,
 
-	// === Base ===
-	message: string;
-	image: string;
-	group_id: number;
-  
-	member_ids: number[];
-	payee_id: number;
-  
-	amount: number;
-	currency_id: number;
+		public member_ids: number[] = [],
+		public payee_id: number,
 
-	description: string;
-	comments: Comment[];
-	datetime: Date;
+		public amount: number,
+		public currency_id: number,
 
-	// ==== Meta ====
-	// Picture
-	picture_id: string;
-	ai_ocr_used: boolean;
-	// Location
-	address: string;
-	coordinates: string;
-	city: string;
+		public description?: string,
+		public comments: Comment[] = [],
+		public datetime: Date = new Date(),
+
+		// ==== Meta ====
+		public picture_id?: string,
+		public ai_ocr_used?: boolean,
+		public address?: string,
+		public coords?: string,
+		public city?: string,
+	) {}
 }
 
-export interface Comment {
-	member_id: string;
-	text: string;
+export class Comment {
+	
+	constructor(
+		public member_id: string,
+		public text: string,
 
-	datetime: Date;
+		public datetime: Date,
+	) {}
 }
 
 export enum SplitMode {
