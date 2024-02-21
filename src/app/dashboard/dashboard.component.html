@@ -112,22 +112,34 @@
 				</form>
 				<form #groupForm2="ngForm">
 					<div class="dashboard__group-empty-new-form__two flex flex-col place-content-center items-center space-y-5">
-						<div class="dashboard__group-empty-new-form__two-label">Add the members of your group</div>
-						<div class="dashboard__group-empty-new-form__two-input place-self-center">
-							<input type="text" class="form-control" id="name"
+						<div for="" class="dashboard__group-empty-new-form__two-label">Add the members of your group</div>
+						<div class="place-self-center"> <!-- flex flex-col -->
+							<!-- Input -->
+							<input type="text" class="form-control dashboard__group-empty-new-form__two-input" id="name"
 							required placeholder="Name or Email"
 							onforminput="newFriendCreateContext"
-							[(ngModel)]="newFriendTemp.name" name="name">
+							[(ngModel)]="newFriendTemp.name" name="name"
+							#name="ngModel">
+							<!-- Context -->
+							<div class="dashboard__group-empty-new-form__two-context">
+								<!-- Search for friends -->
+								<div class="suggestion-row" *ngIf="name.value">
+									<p>Add {{name.value}}</p>
+								</div>
+								<div class="suggestion-row" *ngIf="name.value">
+									<p>Add {{name.value}} account</p>
+								</div>
+							</div>
 						</div>
 						<div class="text-cyan-500 cyan-title">
 							Add an existing user
 						</div>
 						<!-- <div>
 							Invite users from facebook!
-						</div> -->
-						<!-- <div>Add {{groupForm2.form.name.text}}</div>
-						<div>Add email {{groupForm2.form.name.text}}</div> -->
-						<!-- <div *ngFor="let result of friendSearchResults">
+						</div>
+						<div>Add {{groupForm2.form.name.text}}</div>
+						<div>Add email {{groupForm2.form.name.text}}</div>
+						<div *ngFor="let result of friendSearchResults">
 
 						</div>
 						<div>
@@ -148,11 +160,11 @@
 					</div>
 				</form>
 				<!-- Are you sure you want to build an empty group? -->
-				<form>
+				<form class="dashboard__group-new-form-empty py-7 px-4 rounded-sm">
 					<div>
 						Are you sure you want to create an empty group?
 					</div>
-					<div>
+					<div class="flex flex-row place-content-center items-center">
 						<button type="submit" class="bg-cyan-500 rounded py-2 px-3 text-white cyan-button">
 							Yes
 						</button>
@@ -175,7 +187,7 @@
 					</button>
 				</div>
 			</ng-container> -->
-			<ng-container *ngIf="groups.length > 0" class="dashboard__group-content-inner">
+			<ng-container *ngIf="groups.length > 0" class="dashboard__group-content-inner flex flex-row place-content-center items-center">
 				<div *ngFor="let group of groups">
 					{{group|json}}
 				</div>
@@ -189,30 +201,86 @@
 				</div>
 			</ng-container>
 
+			<!-- Transaction 'Bars' -->
 			<div class="transactions flex flex-col">
-				<div class="transaction bg-sky-500 rounded m-1">
-					<div class="transaction-name">Transaction 1</div>
-					<div class="transaction-owner-img"></div>
-					<div class="transaction-amount">50</div>
+				<div class="transaction rounded m-1 flex flex-col">
+					<div class="transaction-row-1 flex flex-row place-content-between">
+						<div class="transaction-name">Dinner &#64;Corsbys</div>
+						<div class="flex flex-row">
+							<div class="transaction-owner-img"></div>
+							<div class="transaction-amount">$55.63</div>
+						</div>
+					</div>
+					<div class="transaction-row-2 flex place-content-start">
+						<div class="transaction-date">17th Jan</div>
+					</div>
+
+					<!-- Transaction Context :hover -->
+					<div class="transaction-context-menu">
+						<div class="transaction-context-edit-button"></div>
+						<div class="transaction-context-hamburger-button"></div>
+						<div class="transaction-context-location-button"></div>
+					</div>
+					<!-- Expanded Content -->
+					<div class="transaction-details">
+
+					</div>
 				</div>
-				<div class="transaction bg-sky-500 rounded m-1">
-					<div class="transaction-name">Transaction 2</div>
-					<div class="transaction-owner-img"></div>
-					<div class="transaction-amount">50</div>
+			</div>
+			<div class="transactions flex flex-col">
+				<div class="transaction rounded m-1 flex flex-col">
+					<div class="transaction-row-1 flex flex-row place-content-between">
+						<div class="transaction-name">Breakfast Buffet &#64;Sheraton</div>
+						<div class="flex flex-row">
+							<div class="transaction-owner-img"></div>
+							<div class="transaction-amount">$240.00</div>
+						</div>
+					</div>
+					<div class="transaction-row-2 flex place-content-start">
+						<div class="transaction-date">18th Jan</div>
+					</div>
+
+					<!-- Transaction Context :hover -->
+					<div class="transaction-context-menu">
+						<div class="transaction-context-edit-button"></div>
+						<div class="transaction-context-hamburger-button"></div>
+						<div class="transaction-context-location-button"></div>
+					</div>
+					<!-- Expanded Content -->
+					<div class="transaction-details">
+
+					</div>
 				</div>
-				<div class="transaction bg-sky-500 rounded m-1">
-					<div class="transaction-name">Transaction 3</div>
-					<div class="transaction-owner-img"></div>
-					<div class="transaction-amount">50</div>
-				</div>
-				<div class="transaction bg-sky-500 rounded m-1">
-					<div class="transaction-name">Transaction 4</div>
-					<div class="transaction-owner-img"></div>
-					<div class="transaction-amount">50</div>
+			</div>
+			<div class="transactions flex flex-col">
+				<div class="transaction rounded m-1 flex flex-col">
+					<div class="transaction-row-1 flex flex-row place-content-between">
+						<div class="transaction-name">Quick Stopby Milkies</div>
+						<div class="flex flex-row">
+							<div class="transaction-owner-img"></div>
+							<div class="transaction-amount">$33.80</div>
+						</div>
+					</div>
+					<div class="transaction-row-2 flex place-content-start">
+						<div class="transaction-date">18th Jan</div>
+					</div>
+
+					<!-- Transaction Context :hover -->
+					<div class="transaction-context-menu">
+						<div class="transaction-context-edit-button"></div>
+						<div class="transaction-context-hamburger-button"></div>
+						<div class="transaction-context-location-button"></div>
+					</div>
+					<!-- Expanded Content -->
+					<div class="transaction-details">
+
+					</div>
 				</div>
 			</div>
 
 			<!-- === New Group Form === -->
+
+			<!-- === Pie Chart === -->
 		</div>
 	</div>
 

@@ -62,3 +62,22 @@ First UX should only have the central pillar. enlarged
 // Default currency
 // For all others, use currency shown
 // Choose exchange rates for finalisation
+
+// Mobile: Click transaction
+// Expand: Description + details and Pictures
+// PC:
+//
+
+// Night mode
+// Colour mode // Whether to display transaction bars as green/red or based on payee's colours
+
+
+
+/* Experimental */
+// Quick Calculator - can xfer numbers
+// Moving the mouse quickly = get out of details
+// Moving the mouse slowly = go through pictures
+
+/* AI */
+// Insert by typing - + context "I paid $50 for milk" -> "Milk @Loc, Date"
+// Scanning reciepts or screenshot reciepts - (or manually memorise grab reciepts)

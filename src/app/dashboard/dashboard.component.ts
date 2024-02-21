@@ -81,4 +81,14 @@ export class DashboardComponent {
 
   // #endregion
 
+  // #region UI Control
+
+  groupApplicationStage: GroupApplicationStage = GroupApplicationStage.NewGroup
+
+  // #endregion UI Control
+
+}
+enum GroupApplicationStage {
+	NewGroup,
+	AddPlayers,
 }
