@@ -15,10 +15,13 @@ export class UserService {
   getGroups(): Observable<Group[]> {
     const groups: Group[] = [{
       id: 0,
+	  name: "Group 1",
+	  deleted: false,
       users: [{
         id: 0,
         name: "Kam",
         email: "Kam@Sg.com",
+		friendIds: [],
       }],
       transactions: [{
         message: "Transaction 1",
@@ -31,11 +34,18 @@ export class UserService {
       
         comments: [],
         datetime: new Date(),
-      }],
-    
+      },],
       // == Meta ==
       date: new Date(),
-    }]
+    },
+	new Group(1, "Group 2")
+	]
     return of(groups);
+  }
+
+  getFriends(user: User): Observable<User[]> {
+	const friends: User[] = []
+
+	return of(friends)
   }
 }

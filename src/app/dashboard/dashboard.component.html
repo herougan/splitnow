@@ -91,7 +91,7 @@
 		<div class="dashboard__group-content flex flex-col place-content-around items-center">
 			<!-- Default Create New  -->
 			<ng-container *ngIf="groups.length <= 0" class="dashboard__group-content-inner">
-				<form #groupForm="ngForm">
+				<form #groupForm="ngForm" *ngIf="major_ui_state == MajorUIEnum.CreateFirstGroup && create_first_group_state == CreateFirstGroupUIEnum.EnterName">
 					<div class="dashboard__group-new-form flex flex-col place-content-center space-y-5">
 						<div class="dashboard__group-new-form-label">What is your group's name?</div>
 						<div class="dashboard__friends-empty-add-new place-self-center">
@@ -100,17 +100,19 @@
 							onforminput="newGroupCreateContext"
 							[(ngModel)]="newGroupTemp.name" name="name">
 						</div>
-						<div class="dashboard__group-empty-add-new-context flex flex-col place-items-center">
-							<button type="submit" id="new_group" class="bg-cyan-500 rounded py-2 px-3 text-white cyan-button" [ngClass]="{'btn-disabled': newGroupTemp.name == ''}" [disabled]="newGroupTemp.name == ''">
-								Start Sharing!
-							</button>
-						</div>
-						<div class="text-cyan-500 cyan-title">
-							Or join an existing splitgroup!
+						<div class="row animated fadeIn" ng-show="newGroupTemp.name != ''">
+							<div class="animated fadeInLeft dashboard__group-empty-add-new-context flex flex-col place-items-center">
+								<button (click)="selectedName()" type="submit" id="new_group" class="bg-cyan-500 rounded py-2 px-3 text-white cyan-button" [ngClass]="{'btn-disabled': newGroupTemp.name == ''}" [disabled]="newGroupTemp.name == ''">
+									Start Sharing!
+								</button>
+							</div>
+							<div (click)="goToJoinGroup()" class="text-cyan-500 cyan-title mt-2">
+								Or join an existing splitgroup!
+							</div>
 						</div>
 					</div>
 				</form>
-				<form #groupForm2="ngForm">
+				<form #groupForm2="ngForm" *ngIf="major_ui_state == MajorUIEnum.CreateFirstGroup && create_first_group_state == CreateFirstGroupUIEnum.AddMembers">
 					<div class="dashboard__group-empty-new-form__two flex flex-col place-content-center items-center space-y-5">
 						<div for="" class="dashboard__group-empty-new-form__two-label">Add the members of your group</div>
 						<div class="place-self-center"> <!-- flex flex-col -->
@@ -119,14 +121,19 @@
 							required placeholder="Name or Email"
 							onforminput="newFriendCreateContext"
 							[(ngModel)]="newFriendTemp.name" name="name"
-							#name="ngModel">
+							#name="ngModel"
+							(focusout)="addFriendFormLoseFocus()"
+							>
 							<!-- Context -->
-							<div class="dashboard__group-empty-new-form__two-context">
+							<div class="dashboard__group-empty-new-form__two-context" [ngClass]="{'highlight': name.value}">
 								<!-- Search for friends -->
-								<div class="suggestion-row" *ngIf="name.value">
+								<div onclick="this.friendContextClick()" class="suggestion-row" *ngIf="name.value">
+									<p>Add Alice (friend)</p>
+								</div>
+								<div onclick="this.friendContextClick()" class="suggestion-row" *ngIf="name.value">
 									<p>Add {{name.value}}</p>
 								</div>
-								<div class="suggestion-row" *ngIf="name.value">
+								<div onclick="this.friendContextClick()" class="suggestion-row" *ngIf="name.value">
 									<p>Add {{name.value}} account</p>
 								</div>
 							</div>
@@ -153,26 +160,36 @@
 							
 						</div> -->
 						<div>
-							<button type="submit" class="bg-cyan-500 rounded py-2 px-3 text-white cyan-button">
+							<button (click)="createGroup()" type="submit" class="bg-cyan-500 rounded py-2 px-3 text-white cyan-button"> <!--  [ngClass]="{'btn-disabled': friends.length == 0}"  -->
 								Create group!
 							</button>
 						</div>
 					</div>
 				</form>
 				<!-- Are you sure you want to build an empty group? -->
-				<form class="dashboard__group-new-form-empty py-7 px-4 rounded-sm">
+				<form class="dashboard__group-new-form-empty py-7 px-4 rounded-sm" *ngIf="major_ui_state == MajorUIEnum.CreateFirstGroup && create_first_group_state == CreateFirstGroupUIEnum.EmptyGroupDialogue">
 					<div>
 						Are you sure you want to create an empty group?
 					</div>
 					<div class="flex flex-row place-content-center items-center">
-						<button type="submit" class="bg-cyan-500 rounded py-2 px-3 text-white cyan-button">
+						<button (click)="emptyGroupConfirmation()" type="submit" class="bg-cyan-500 rounded py-2 px-3 text-white cyan-button">
 							Yes
 						</button>
-						<button type="submit" class="bg-cyan-500 rounded py-2 px-3 text-white cyan-button">
+						<button (click)="emptyGroupCancel()" type="submit" class="bg-cyan-500 rounded py-2 px-3 text-white cyan-button">
 							Cancel
 						</button>
 					</div>
 				</form>
+				<!-- Group Created! -->
+				<div class="dashboard__group-create-success">
+					<div *ngIf="major_ui_state == MajorUIEnum.CreateFirstGroup && create_first_group_state == CreateFirstGroupUIEnum.Created">
+						Congratulations! Your group has been created!
+					</div>
+					<div>
+						<button></button>
+					</div>
+				</div>
+
 			</ng-container>
 			<!-- If <= 0 n_groups, default page is "create a new group" -->
 			<!-- Create a new group page: 
@@ -187,12 +204,14 @@
 					</button>
 				</div>
 			</ng-container> -->
+
+			<!-- Groups 'Bar' -->
 			<ng-container *ngIf="groups.length > 0" class="dashboard__group-content-inner flex flex-row place-content-center items-center">
 				<div *ngFor="let group of groups">
 					{{group|json}}
 				</div>
 				<div class="dashboard__group-new">
-					<button class="dashboard__group-new-group" type="button" mat-fab extended (click)="newGroup()">
+					<button class="dashboard__group-new-group" type="button" mat-fab extended (click)="selectedName()">
 						New
 					</button>
 				</div>
@@ -202,78 +221,80 @@
 			</ng-container>
 
 			<!-- Transaction 'Bars' -->
-			<div class="transactions flex flex-col">
-				<div class="transaction rounded m-1 flex flex-col">
-					<div class="transaction-row-1 flex flex-row place-content-between">
-						<div class="transaction-name">Dinner &#64;Corsbys</div>
-						<div class="flex flex-row">
-							<div class="transaction-owner-img"></div>
-							<div class="transaction-amount">$55.63</div>
+			<div class="dashboard__group-transaction-list">
+				<div class="transactions flex flex-col">
+					<div class="transaction rounded m-1 flex flex-col">
+						<div class="transaction-row-1 flex flex-row place-content-between">
+							<div class="transaction-name">Dinner &#64;Corsbys</div>
+							<div class="flex flex-row">
+								<div class="transaction-owner-img"></div>
+								<div class="transaction-amount">$55.63</div>
+							</div>
 						</div>
-					</div>
-					<div class="transaction-row-2 flex place-content-start">
-						<div class="transaction-date">17th Jan</div>
-					</div>
-
-					<!-- Transaction Context :hover -->
-					<div class="transaction-context-menu">
-						<div class="transaction-context-edit-button"></div>
-						<div class="transaction-context-hamburger-button"></div>
-						<div class="transaction-context-location-button"></div>
-					</div>
-					<!-- Expanded Content -->
-					<div class="transaction-details">
-
+						<div class="transaction-row-2 flex place-content-start">
+							<div class="transaction-date">17th Jan</div>
+						</div>
+	
+						<!-- Transaction Context :hover -->
+						<div class="transaction-context-menu">
+							<div class="transaction-context-edit-button"></div>
+							<div class="transaction-context-hamburger-button"></div>
+							<div class="transaction-context-location-button"></div>
+						</div>
+						<!-- Expanded Content -->
+						<div class="transaction-details">
+	
+						</div>
 					</div>
 				</div>
-			</div>
-			<div class="transactions flex flex-col">
-				<div class="transaction rounded m-1 flex flex-col">
-					<div class="transaction-row-1 flex flex-row place-content-between">
-						<div class="transaction-name">Breakfast Buffet &#64;Sheraton</div>
-						<div class="flex flex-row">
-							<div class="transaction-owner-img"></div>
-							<div class="transaction-amount">$240.00</div>
+				<div class="transactions flex flex-col">
+					<div class="transaction rounded m-1 flex flex-col">
+						<div class="transaction-row-1 flex flex-row place-content-between">
+							<div class="transaction-name">Breakfast Buffet &#64;Sheraton</div>
+							<div class="flex flex-row">
+								<div class="transaction-owner-img"></div>
+								<div class="transaction-amount">$240.00</div>
+							</div>
 						</div>
-					</div>
-					<div class="transaction-row-2 flex place-content-start">
-						<div class="transaction-date">18th Jan</div>
-					</div>
-
-					<!-- Transaction Context :hover -->
-					<div class="transaction-context-menu">
-						<div class="transaction-context-edit-button"></div>
-						<div class="transaction-context-hamburger-button"></div>
-						<div class="transaction-context-location-button"></div>
-					</div>
-					<!-- Expanded Content -->
-					<div class="transaction-details">
-
+						<div class="transaction-row-2 flex place-content-start">
+							<div class="transaction-date">18th Jan</div>
+						</div>
+	
+						<!-- Transaction Context :hover -->
+						<div class="transaction-context-menu">
+							<div class="transaction-context-edit-button"></div>
+							<div class="transaction-context-hamburger-button"></div>
+							<div class="transaction-context-location-button"></div>
+						</div>
+						<!-- Expanded Content -->
+						<div class="transaction-details">
+	
+						</div>
 					</div>
 				</div>
-			</div>
-			<div class="transactions flex flex-col">
-				<div class="transaction rounded m-1 flex flex-col">
-					<div class="transaction-row-1 flex flex-row place-content-between">
-						<div class="transaction-name">Quick Stopby Milkies</div>
-						<div class="flex flex-row">
-							<div class="transaction-owner-img"></div>
-							<div class="transaction-amount">$33.80</div>
+				<div class="transactions flex flex-col">
+					<div class="transaction rounded m-1 flex flex-col">
+						<div class="transaction-row-1 flex flex-row place-content-between">
+							<div class="transaction-name">Quick Stopby Milkies</div>
+							<div class="flex flex-row">
+								<div class="transaction-owner-img"></div>
+								<div class="transaction-amount">$33.80</div>
+							</div>
 						</div>
-					</div>
-					<div class="transaction-row-2 flex place-content-start">
-						<div class="transaction-date">18th Jan</div>
-					</div>
-
-					<!-- Transaction Context :hover -->
-					<div class="transaction-context-menu">
-						<div class="transaction-context-edit-button"></div>
-						<div class="transaction-context-hamburger-button"></div>
-						<div class="transaction-context-location-button"></div>
-					</div>
-					<!-- Expanded Content -->
-					<div class="transaction-details">
-
+						<div class="transaction-row-2 flex place-content-start">
+							<div class="transaction-date">18th Jan</div>
+						</div>
+	
+						<!-- Transaction Context :hover -->
+						<div class="transaction-context-menu">
+							<div class="transaction-context-edit-button"></div>
+							<div class="transaction-context-hamburger-button"></div>
+							<div class="transaction-context-location-button"></div>
+						</div>
+						<!-- Expanded Content -->
+						<div class="transaction-details">
+	
+						</div>
 					</div>
 				</div>
 			</div>
@@ -281,6 +302,10 @@
 			<!-- === New Group Form === -->
 
 			<!-- === Pie Chart === -->
+		</div>
+
+		<div class="dashboard__alerts">
+
 		</div>
 	</div>
 
@@ -299,7 +324,7 @@
 
 		<!-- === New Button === -->
 		<div *ngIf="newGroupFlag">
-			<button class="dashboard__balance-new-group" type="button" mat-fab extended (click)="newGroup()">
+			<button class="dashboard__balance-new-group" type="button" mat-fab extended (click)="selectedName()">
 
 			</button>
 		</div>

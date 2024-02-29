@@ -81,3 +81,6 @@ First UX should only have the central pillar. enlarged
 /* AI */
 // Insert by typing - + context "I paid $50 for milk" -> "Milk @Loc, Date"
 // Scanning reciepts or screenshot reciepts - (or manually memorise grab reciepts)
+
+// Page-component standard
+https://medium.com/angular-in-depth/the-page-pattern-9f437ec99d7b
