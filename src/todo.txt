@@ -1,3 +1,9 @@
+// Todo bugs, before moving on
+// Remove forms -> divs
+// Input event listener
+
+
+
 [Splitter's Journey]
 Put friend-search into a sub-component: determine if friend bar and group bar can share into
 

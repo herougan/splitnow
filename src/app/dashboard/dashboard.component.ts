@@ -8,6 +8,7 @@ import { SimpleUser, User } from '../structures/user';
 import { Group } from '../structures/group';
 import { JsonPipe } from '@angular/common';
 import gsap from 'gsap';
+import { UserService } from '../service/user/user.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -20,6 +21,10 @@ import gsap from 'gsap';
 export class DashboardComponent {
 
 	// #region ===== Preamble =====
+
+	// Test Flags
+	test_ui = true
+
 	// Flags
 	editGroupFlag = false
 	newGroupFlag = false
@@ -43,7 +48,7 @@ export class DashboardComponent {
 	]
 	// #endregion
 
-	// TODO ask stackoverflow
+	// #region ----- State -----
 	// UI State
 	major_ui_state: MajorUIEnum = this.groups.length == 0 ? 0 : 1
 	create_first_group_state: CreateFirstGroupUIEnum = 0
@@ -52,6 +57,31 @@ export class DashboardComponent {
 	MajorUIEnum = MajorUIEnum
 	CreateFirstGroupUIEnum = CreateFirstGroupUIEnum
 	CreateNewGroupUIEnum = CreateNewGroupUIEnum
+	
+	// User
+	user: User = new User(0, "") // How to maintain user states?
+
+	// #endregion ----- State -----
+
+	// #region ===== Init =====
+
+	// State store TODO
+	getAllFriendsStatus: boolean = false
+	allFriends: User[] = []
+
+	init(): boolean {
+
+		this.getFriends()
+
+		return true
+	}
+
+	getFriends(): void {
+		this.getAllFriendsStatus = false
+
+	}
+
+	// #endregion ===== Init =====
 
 	// #region ===== Enter Name =====
 	newGroupTemp = {
@@ -76,27 +106,101 @@ export class DashboardComponent {
 
 	// #region ===== Add Members =====
 	newFriendTemp = {
-	name: "",
+		name: "",
 	}
+	friendFound = false // Alphabetic matchs
+	accountFound = false // Exact match required
 
-	newFriendCreateContext(): void {
+	addFriendInput(): void {
+		this.friendFound = false
 		if (this.newFriendTemp.name == "") {
 
 		}
 		console.log(`Create a new friend named ${this.newFriendTemp.name}`)
 		if (this.friends.length > 0)
 			console.log(`Searching friend list...`)
+	}
+
+	// === Friends Search ===
+	friendSearchResults: User[] = [new User(0,"",[])];
+	accountSearchResult: User = new User(0, "");
+
+	searchFriends(phrase: string): void {
+	 	this.userService.searchFriends(this.user, phrase).subscribe(results => this.friendSearchResults = results)
+
+	}
+
+	searchUser(exact: string): void {
+		this.accountSearchResult.name = ""
+		let tempUser: User = new User(0, "")
+
+		this.userService.tryGet(exact).subscribe(result => tempUser = result)
+		if (tempUser.id == 0) {
+			console.log(`User "${exact}" not found`)
+			return
 		}
 
-		// Friends Search
-		friendSearchResults: User[] = [new User(0,"",[])];
+		this.userService.isFriend(this.user, this.accountSearchResult).subscribe(isFriend => {
+			if (isFriend) {
+				// Do Nothing
+			} else {
+				this.accountSearchResult = tempUser
+			}
+		})
+	}
 
-		friendContextClick(): void {
-		console.log(`Add {name}`)
+	// === Friends lists ===
+	newMemberListResults: SimpleUser[] = [];
+	userToBeAdded: User = new User(0, "")
+
+	// Add member context actions
+	addFriendContextClick(): void {
+		console.log(`Add Friend ${this.newFriendTemp.name}`)
+		// Get friend
+
+		// Create link
+		
+		this.newMemberListResults.push(new SimpleUser(this.newFriendTemp.name))
+	}
+	addNonUserContextClick(): void {
+		console.log(`Add Non User ${this.newFriendTemp.name}`)
+		this.newMemberListResults.push(new SimpleUser(this.newFriendTemp.name))
+	}
+	addUserContextClick(): void {
+		console.log(`Add User ${this.newFriendTemp.name}`)
+		// Get user
+		const other: User = this.userToBeAdded
+		if (other.id == 0) {
+			console.log("Erronerous user!") // UI feedback checks & Important console checks here. Main checks in service
+			return
+		}
+
+		// Check if friend (add if not)
+		this.userService.isFriend(this.user, other).subscribe(isFriend => {
+			if (isFriend) {
+				// Do nothing
+			} else {
+				// Otherwise, add friend
+				this.userService.addFriend(this.user, other)
+			}
+		})
+
+		// ...
+		this.newMemberListResults.push(new SimpleUser(this.newFriendTemp.name))
 	}
 
 	addFriendFormLoseFocus(): void {
-		this.newFriendTemp.name = ""
+		setTimeout(() => {
+			console.log("Lost focus")
+			this.newFriendTemp.name = ""
+		}, 50);
+	}
+
+	removeMember(i: number): void {
+		if (i < 0) return
+		if (i >= this.newMemberListResults.length) return
+		console.log(`Remove ${this.newMemberListResults[i].name}`)
+		this.newMemberListResults.splice(i, 1)
 	}
 
 	createGroup(): void {
@@ -165,6 +269,12 @@ export class DashboardComponent {
 	}
 
 	// #endregion UI Control
+
+	constructor(private userService: UserService) {
+
+		//Initialise
+		this.init()
+	}
 
 }
 

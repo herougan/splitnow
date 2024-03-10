@@ -39,7 +39,7 @@
 						<div class="dashboard__friends-empty-add-new place-self-center">
 							<input type="text" class="form-control" id="name"
 							required placeholder="Add a new friend!"
-							onforminput="newFriendCreateContext"
+							onforminput="addFriendInput"
 							[(ngModel)]="newFriendTemp.name" name="name">
 						</div>
 						<div *ngIf="newFriendTemp.name != ''" class="dashboard__friends-empty-add-new-context flex flex-col place-items-center">
@@ -91,7 +91,7 @@
 		<div class="dashboard__group-content flex flex-col place-content-around items-center">
 			<!-- Default Create New  -->
 			<ng-container *ngIf="groups.length <= 0" class="dashboard__group-content-inner">
-				<form #groupForm="ngForm" *ngIf="major_ui_state == MajorUIEnum.CreateFirstGroup && create_first_group_state == CreateFirstGroupUIEnum.EnterName">
+				<form #groupForm="ngForm" *ngIf="major_ui_state == MajorUIEnum.CreateFirstGroup && create_first_group_state == CreateFirstGroupUIEnum.EnterName || test_ui">
 					<div class="dashboard__group-new-form flex flex-col place-content-center space-y-5">
 						<div class="dashboard__group-new-form-label">What is your group's name?</div>
 						<div class="dashboard__friends-empty-add-new place-self-center">
@@ -112,33 +112,38 @@
 						</div>
 					</div>
 				</form>
-				<form #groupForm2="ngForm" *ngIf="major_ui_state == MajorUIEnum.CreateFirstGroup && create_first_group_state == CreateFirstGroupUIEnum.AddMembers">
+				<form #groupForm2="ngForm" *ngIf="major_ui_state == MajorUIEnum.CreateFirstGroup && create_first_group_state == CreateFirstGroupUIEnum.AddMembers || test_ui">
 					<div class="dashboard__group-empty-new-form__two flex flex-col place-content-center items-center space-y-5">
 						<div for="" class="dashboard__group-empty-new-form__two-label">Add the members of your group</div>
-						<div class="place-self-center"> <!-- flex flex-col -->
+						<div class="place-self-center dashboard__group-empty-new-form-container" 
+						(focusout)="addFriendFormLoseFocus()" tabindex="-1"> <!-- flex flex-col -->
 							<!-- Input -->
 							<input type="text" class="form-control dashboard__group-empty-new-form__two-input" id="name"
 							required placeholder="Name or Email"
-							onforminput="newFriendCreateContext"
+							(keyup)="addFriendInput"
 							[(ngModel)]="newFriendTemp.name" name="name"
 							#name="ngModel"
-							(focusout)="addFriendFormLoseFocus()"
+							#friendNameInput
 							>
 							<!-- Context -->
 							<div class="dashboard__group-empty-new-form__two-context" [ngClass]="{'highlight': name.value}">
 								<!-- Search for friends -->
-								<div onclick="this.friendContextClick()" class="suggestion-row" *ngIf="name.value">
-									<p>Add Alice (friend)</p>
+								<div (click)="addFriendContextClick()" class="suggestion-row" *ngIf="name.value && name.value">
+									<p>Add Alice (friend)</p> <!-- Add friend-->
 								</div>
-								<div onclick="this.friendContextClick()" class="suggestion-row" *ngIf="name.value">
-									<p>Add {{name.value}}</p>
+								<div (click)="addNonUserContextClick()" class="suggestion-row" *ngIf="name.value">
+									<p>Add {{name.value}}</p> <!-- Add an empty user -->
 								</div>
-								<div onclick="this.friendContextClick()" class="suggestion-row" *ngIf="name.value">
-									<p>Add {{name.value}} account</p>
+								<div (click)="addUserContextClick()" class="suggestion-row" *ngIf="name.value && name.value">
+									<p>Add {{name.value}} account</p> <!-- Add non-friend account -->
 								</div>
 							</div>
+							<!-- Sing -->
+							<div>
+
+							</div>
 						</div>
-						<div class="text-cyan-500 cyan-title">
+						<div class="text-cyan-500 cyan-title dashboard__group-empty-new-form__add-label">
 							Add an existing user
 						</div>
 						<!-- <div>
@@ -148,17 +153,27 @@
 						<div>Add email {{groupForm2.form.name.text}}</div>
 						<div *ngFor="let result of friendSearchResults">
 
-						</div>
-						<div>
-							<div *ngFor="let member of newGroupTemp.members">
-								<tr *ngFor="let result of friendSearchResults;let i = index">
-								   <td><input name="staff.{{i}}.name" [(ngModel)]="staff.name">{{staff.name}}</td>
-								</tr>
-							</div>
+						</div> -->
+						<!-- Member List -->
+						<div class="dashboard__group-empty-new-form__member-list">
+							<tr *ngFor="let member of newMemberListResults;let i = index">
+								<td>
+									<div id="member-{{i}}" class="member-row items-center px-1 flex place-content-between" [(ngModel)]="member.name">
+										<ng-container *ngIf="member.user;else non_user">
+											<div class="member-row-text user-link">{{member.name}}</div>
+											<div id="member-del-{{i}}" class="member-row-del" (click)="removeMember(i)"></div>
+										</ng-container>
+										<ng-template #non_user>
+											<div class="member-row-text">{{member.name}}</div>
+											<div id="member-del-{{i}}" class="member-row-del" (click)="removeMember(i)"></div>
+										</ng-template>
+									</div>
+								</td>
+							</tr>
 						</div>
 						<div class="dashboard__group-empty-new-form__two-context flex flex-col place-items-center">
 							
-						</div> -->
+						</div>
 						<div>
 							<button (click)="createGroup()" type="submit" class="bg-cyan-500 rounded py-2 px-3 text-white cyan-button"> <!--  [ngClass]="{'btn-disabled': friends.length == 0}"  -->
 								Create group!
@@ -167,7 +182,7 @@
 					</div>
 				</form>
 				<!-- Are you sure you want to build an empty group? -->
-				<form class="dashboard__group-new-form-empty py-7 px-4 rounded-sm" *ngIf="major_ui_state == MajorUIEnum.CreateFirstGroup && create_first_group_state == CreateFirstGroupUIEnum.EmptyGroupDialogue">
+				<form class="dashboard__group-new-form-empty py-7 px-4 rounded-sm" *ngIf="major_ui_state == MajorUIEnum.CreateFirstGroup && create_first_group_state == CreateFirstGroupUIEnum.EmptyGroupDialogue || test_ui">
 					<div>
 						Are you sure you want to create an empty group?
 					</div>
