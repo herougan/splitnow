@@ -7,11 +7,11 @@ import { User } from '../structures/user';
 import { Transaction } from '../structures/transaction';
 
 @Component({
-  selector: 'app-new-group-form',
-  standalone: true,
-  imports: [JsonPipe, FormsModule, ReactiveFormsModule, CommonModule],
-  templateUrl: './new-group-form.component.html',
-  styleUrl: './new-group-form.component.sass'
+	selector: 'app-new-group-form',
+	standalone: true,
+	imports: [JsonPipe, FormsModule, ReactiveFormsModule, CommonModule],
+	templateUrl: './new-group-form.component.html',
+	styleUrl: './new-group-form.component.sass'
 })
 export class NewGroupFormComponent {
 
@@ -22,13 +22,15 @@ export class NewGroupFormComponent {
 	activated__addPeople = false;
 
 	model = new Group(
-		18, 
+		18,
 		"Oxfords",
 		[
 			new User(0, "Alice"),
 		],
+		[],
+		[],
 		[
-			new Transaction("Buffet", [], 0, 100, 0, "Jakarta"),
+			new Transaction("Buffet", -1, -1, [], 0, 100, 0, "Jakarta"),
 		],
 	);
 

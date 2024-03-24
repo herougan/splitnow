@@ -26,8 +26,8 @@ export class User {
 export class SimpleUser {
 
 	constructor(
-		public name?: string,
-		public user?: User,
+		public name: string,
+		public tempId: number,
 	) {}
 
 }

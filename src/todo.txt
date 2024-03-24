@@ -1,7 +1,7 @@
-// Todo bugs, before moving on
-// Remove forms -> divs
-// Input event listener
-
+// Complete all services on the backend first
+// Display transactions
+// Move code to "page" ts (Separate ui logic from backend logic)
+// Split into sub components
 
 
 [Splitter's Journey]

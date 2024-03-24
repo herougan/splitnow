@@ -12,13 +12,18 @@ import { Pipe, PipeTransform } from '@angular/core';
   standalone: true,
   name: 'forexAccFormat'
 })
-export class AccountingFormatPipe implements PipeTransform {
-  transform(value: number): string {
+export class ForexAccountingFormatPipe implements PipeTransform {
+  transform(value: number, currency_id: number): string {
 	if (value > 0)
-		return `${value}`
+		return `${value} ${currencyDict[currency_id]}`
 	else
-		return `(${value})`
+		return `(${value * -1}) ${currencyDict[currency_id]}`
   }
+}
+const currencyDict: { [key: number]: string } = {
+	0: "$",
+	1: "SGD",
+	2: "$"
 }
 
 /*

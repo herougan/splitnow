@@ -120,15 +120,24 @@
 	vertical-align: middle
 
 	.member-row-del
-		width: 30px
-		height: 30px
-		background-color: red
+		width: 25px
+		height: 25px
+
+		background-image: url("../../assets/static/resources/img/cancel_grey.png")
+		background-size: 100% 100%
+
+		&:hover
+			background-image: url('../../assets/static/resources/img/cancel.png')
+			background-size: 100% 100%
 
 	.member-row-text
 		width:170px
 		text-overflow: ellipsis
 		overflow: hidden
-		
+
+		&.is_member:hover
+				color: $cyan-500
+
 /* #endregion */
 
 /* #region Balance bar Right */
@@ -170,6 +179,17 @@
 
 .transaction-amount
 
+
+.transactions
+	// opacity: 0
+
+.transaction-button
+	background-color: $light_secondary
+	// display: flex
+	// flex-direction: col
+	// align-items: center
+	width: 50px
+	height: 50px
 
 .transaction
 	background-color: $light

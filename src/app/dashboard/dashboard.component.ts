@@ -9,13 +9,16 @@ import { Group } from '../structures/group';
 import { JsonPipe } from '@angular/common';
 import gsap from 'gsap';
 import { UserService } from '../service/user/user.service';
+import { Transaction } from '../structures/transaction';
+import { ForexAccountingFormatPipe } from '../pipes/forexAccFormat';
+import { GroupService } from '../service/group/group.service';
 
 @Component({
-    selector: 'app-dashboard',
-    standalone: true,
-    templateUrl: './dashboard.component.html',
-    styleUrl: './dashboard.component.sass',
-    imports: [CommonModule, AccountingFormatPipe, NewGroupFormComponent, FormsModule, ReactiveFormsModule, JsonPipe]
+	selector: 'app-dashboard',
+	standalone: true,
+	templateUrl: './dashboard.component.html',
+	styleUrl: './dashboard.component.sass',
+	imports: [CommonModule, AccountingFormatPipe, ForexAccountingFormatPipe, NewGroupFormComponent, FormsModule, ReactiveFormsModule, JsonPipe]
 })
 
 export class DashboardComponent {
@@ -30,21 +33,21 @@ export class DashboardComponent {
 	newGroupFlag = false
 
 	// People
-	person = { 
-	name: "Kammy Leong",
-	balance: 0,
+	person = {
+		name: "Kammy Leong",
+		balance: 0,
 	};
 
 	friends: SimpleUser[] = [
-	// {
-	// 	name: "Sammy Lang",
-	// }
+		// {
+		// 	name: "Sammy Lang",
+		// }
 	];
 
 	groups: Group[] = [
-	// {
-	// name: "Primary School"
-	// },
+		// {
+		// name: "Primary School"
+		// },
 	]
 	// #endregion
 
@@ -57,7 +60,7 @@ export class DashboardComponent {
 	MajorUIEnum = MajorUIEnum
 	CreateFirstGroupUIEnum = CreateFirstGroupUIEnum
 	CreateNewGroupUIEnum = CreateNewGroupUIEnum
-	
+
 	// User
 	user: User = new User(0, "") // How to maintain user states?
 
@@ -83,28 +86,31 @@ export class DashboardComponent {
 
 	// #endregion ===== Init =====
 
-	// #region ===== Enter Name =====
+	// #region ===== UI: Enter Name =====
 	newGroupTemp = {
-	name: "",
-	members: [],
+		name: "",
+		members: [],
 	}
 
 	selectedName(): void {
-	console.log("New Group");
-	this.editGroupFlag = true;
-	this.create_first_group_state = CreateFirstGroupUIEnum.AddMembers
+		console.log("New Group");
+		this.editGroupFlag = true;
+		this.create_first_group_state = CreateFirstGroupUIEnum.AddMembers
 	}
 
 	newGroupCreateContext(): void {
-	if (this.newGroupTemp.name == "") {
+		if (this.newGroupTemp.name == "") {
 
-	}
-	console.log(`Creating new group named ${this.newGroupTemp.name}`)
+		}
+		console.log(`Creating new group named ${this.newGroupTemp.name}`)
 	}
 
 	// #endregion
 
-	// #region ===== Add Members =====
+	// #region ===== UI: Add Members =====
+
+	// ==== Add Friend ===
+
 	newFriendTemp = {
 		name: "",
 	}
@@ -122,12 +128,12 @@ export class DashboardComponent {
 	}
 
 	// === Friends Search ===
-	friendSearchResults: User[] = [new User(0,"",[])];
+
+	friendSearchResults: User[] = [new User(0, "", [])];
 	accountSearchResult: User = new User(0, "");
 
 	searchFriends(phrase: string): void {
-	 	this.userService.searchFriends(this.user, phrase).subscribe(results => this.friendSearchResults = results)
-
+		this.userService.searchFriends(this.user, phrase).subscribe(results => this.friendSearchResults = results)
 	}
 
 	searchUser(exact: string): void {
@@ -150,7 +156,6 @@ export class DashboardComponent {
 	}
 
 	// === Friends lists ===
-	newMemberListResults: SimpleUser[] = [];
 	userToBeAdded: User = new User(0, "")
 
 	// Add member context actions
@@ -159,53 +164,67 @@ export class DashboardComponent {
 		// Get friend
 
 		// Create link
-		
-		this.newMemberListResults.push(new SimpleUser(this.newFriendTemp.name))
+		const other: User = this.userToBeAdded
+		if (other.id == -1) {
+			console.log("Erronerous friend!") // UI feedback checks & Important console checks here. Main checks in service
+			// loggerService.logError("{this.currentUser} failed to add friend:({this.userToBeAdded.name}) into group:({this.currentGroup.name})")
+			return
+		}
+		this.groupService.addUser(this.currentGroup.id, other.id)
 	}
+
 	addNonUserContextClick(): void {
 		console.log(`Add Non User ${this.newFriendTemp.name}`)
-		this.newMemberListResults.push(new SimpleUser(this.newFriendTemp.name))
+
+		this.groupService.addSimpleUser(this.currentGroup.id, this.newFriendTemp.name).subscribe(group => {
+			this.currentGroup = group
+		})
+
+		// Anim
+
+		// this.newMemberSimpleUsers.push(new SimpleUser(this.newFriendTemp.name))
 	}
+
 	addUserContextClick(): void {
 		console.log(`Add User ${this.newFriendTemp.name}`)
+		// loggerService.log("Client: Try to Add user ${} to group ${}")
+
 		// Get user
 		const other: User = this.userToBeAdded
-		if (other.id == 0) {
+		if (other.id == -1) {
 			console.log("Erronerous user!") // UI feedback checks & Important console checks here. Main checks in service
 			return
 		}
+		this.groupService.addUser(this.currentGroup.id, other.id)
 
 		// Check if friend (add if not)
 		this.userService.isFriend(this.user, other).subscribe(isFriend => {
-			if (isFriend) {
-				// Do nothing
-			} else {
-				// Otherwise, add friend
-				this.userService.addFriend(this.user, other)
-			}
+			// if (isFriend) {
+			// 	// Do nothing
+			// } else {
+			// 	// Otherwise, add friend
+			// 	this.userService.addFriend(this.user, other)
+			// }
 		})
-
-		// ...
-		this.newMemberListResults.push(new SimpleUser(this.newFriendTemp.name))
 	}
 
 	addFriendFormLoseFocus(): void {
 		setTimeout(() => {
-			console.log("Lost focus")
 			this.newFriendTemp.name = ""
-		}, 50);
+		}, 150);
 	}
 
 	removeMember(i: number): void {
 		if (i < 0) return
-		if (i >= this.newMemberListResults.length) return
-		console.log(`Remove ${this.newMemberListResults[i].name}`)
-		this.newMemberListResults.splice(i, 1)
+		if (i >= this.currentGroup.users.length) return
+		console.log(`Remove ${this.currentGroup.users[i].name}`)
+		this.currentGroup.users.splice(i, 1)
 	}
 
-	createGroup(): void {
+	createNewGroup(): void {
 		console.log("Create Group");
-		this.create_first_group_state = this.friends.length == 0 ? CreateFirstGroupUIEnum.EmptyGroupDialogue : CreateFirstGroupUIEnum.Created
+		this.create_first_group_state = this.currentGroup.users.length == 0 ? CreateFirstGroupUIEnum.EmptyGroupDialogue : CreateFirstGroupUIEnum.Created
+		if (this.currentGroup.users.length > 0) this.createGroup()
 	}
 
 	goToJoinGroup(): void {
@@ -214,15 +233,15 @@ export class DashboardComponent {
 	}
 
 	congratulations() {
-	// var tl = gsap.timeline({})
-	// tl.to('.transaction', {})
-	// tl.to('.transaction', {})
+		// var tl = gsap.timeline({})
+		// tl.to('.transaction', {})
+		// tl.to('.transaction', {})
 	}
 
 	// ----- Are you Sure ----- //
 	emptyGroupConfirmation() {
 		console.log("Create empty group")
-		this.goToCreated()
+		this.createGroup()
 	}
 
 	emptyGroupCancel() {
@@ -230,15 +249,32 @@ export class DashboardComponent {
 		this.create_first_group_state = CreateFirstGroupUIEnum.AddMembers
 	}
 
+	// --- Group Created --- //
+	currentGroup: Group = Group.Empty()
+
+	createTransaction() {
+
+	}
+
 	// #endregion
 
-	// #region ===== UI Control =====
+	// #region === Create Transaction UI ===
+
+
+	//
+
+	// #region ===== UI: Final =====
+
+	// === Animation ===
 
 	// Fetch current ui state from store
 	// fetchedState == {} || null
 
-	goToCreated(): void {
+	createGroup(): void {
 		this.create_first_group_state = CreateFirstGroupUIEnum.Created
+		this.groupService.createGroup(this.currentGroup).subscribe(group => this.currentGroup = group)
+		this.getTransactions()
+
 		var tl = gsap.timeline({
 
 		})
@@ -250,14 +286,22 @@ export class DashboardComponent {
 				duration: 1.0,
 			}
 		).to(
+			'.dashboard__group-create-success',
+			{
+				duration: 1.0,
+			}
+		)
+
+
+		// Then 
+		this.major_ui_state = MajorUIEnum.Group
+		var tl2 = gsap.timeline({
+
+		})
+		tl2.from(
 			'.dashboard__group-transaction-list',
 			{
 				opacity: 0,
-				duration: 1.0,
-			}
-		).from(
-			'.dashboard__group-create-success',
-			{
 				duration: 1.0,
 			}
 		).to(
@@ -268,13 +312,27 @@ export class DashboardComponent {
 		)
 	}
 
+	// === Transaction ===
+
+	transactions: Transaction[] = []
+
+	getTransactions(): void {
+		this.groupService.getTransactions(this.currentGroup.id).subscribe(
+			t => { this.transactions = t }
+		)
+	}
+
 	// #endregion UI Control
 
-	constructor(private userService: UserService) {
+	// #region ===== Endsay =====
+
+	constructor(private userService: UserService, private groupService: GroupService) {
 
 		//Initialise
 		this.init()
 	}
+
+	// #endregion ===== Endsay =====
 
 }
 
@@ -291,4 +349,5 @@ enum MajorUIEnum {
 	CreateFirstGroup,
 	CreateNewGroup,
 	JoinGroup,
+	Group,
 }
