@@ -251,9 +251,12 @@ export class DashboardComponent {
 
 	// --- Group Created --- //
 	currentGroup: Group = Group.Empty()
+	new_transaction_text: string = ""
+	new_transaction_payee: number = -1
+	new_transaction_amount: number = -1
 
 	createTransaction() {
-
+		this.groupService.createTransaction(this.currentGroup.id, this.new_transaction_text, this.new_transaction_payee, this.new_transaction_amount)
 	}
 
 	// #endregion

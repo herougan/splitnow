@@ -32,47 +32,39 @@ export class GroupService {
 
 	updateGroup(group: Group): Observable<Group> {
 		// Search Group
-		// TODO foreach continues and doesn't stop returning apparently - use a flag.
-		this.fakeGroups.forEach(_group => {
-			if (_group.id == group.id) {
-				_group = group
-				return of(_group)
+		for (let i = 0; i < this.fakeGroups.length; ++i) {
+			if (this.fakeGroups[i].id == group.id) {
+				this.fakeGroups[i] = group
+				return of(this.fakeGroups[i])
 			}
-		})
-		// Update group
+		}
 
 		return of(Group.Error("Could not find Group!"))
 	}
 
 	addUser(groupId: number, userId: number): Observable<Group> {
 		// Search Group
-		this.fakeGroups.forEach(group => {
-			if (group.id == groupId) {
-				// Search Users
-				// ... users.forEach(user = {})
-
-				// Add User
-				group.users.push(
-					new User(-1, "New User")
+		for (let i = 0; i < this.fakeGroups.length; ++i) {
+			if (this.fakeGroups[i].id == groupId) {
+				this.fakeGroups[i].users.push(
+					new User(-1, "New User") // TODO
 				)
-				return of(group)
+				return of(this.fakeGroups[i])
 			}
-		})
+		}
 
 		return of(Group.Error("Cannot add simpleUser: Group not found"))
 	}
 
 	addSimpleUser(groupId: number, name: string): Observable<Group> {
 		// Search Group
-		this.fakeGroups.forEach(group => {
-			if (group.id == groupId) {
-				// Add User
-				group.simpleUsers.push(
-					new SimpleUser(name, group.simpleUsers.length)
+		for (let i = 0; i < this.fakeGroups.length; ++i) {
+			if (this.fakeGroups[i].id == groupId) {
+				this.fakeGroups[i].simpleUsers.push(
+					new SimpleUser("", -1) // TODO
 				)
-				return of(group)
 			}
-		})
+		}
 
 		// Error
 		return of(Group.Error("Cannot add simpleUser: Group not found"))
@@ -80,21 +72,23 @@ export class GroupService {
 
 	removeUser(groupId: number, userId: number): Observable<Group> {
 		// Search group
-		this.fakeGroups.forEach(group => {
-			if (group.id == groupId) {
+		for (let i = 0; i < this.fakeGroups.length; ++i) {
+			if (this.fakeGroups[i].id == groupId) {
 				// Add User
-				let idx: number = group.users.findIndex(user => user.id == userId)
-
-				if (idx > -1) {
-					delete group.users[idx]
-				} else {
-					// loggerService.logError("Failed to remove user: User {} not found in group {}")
-					return of(Group.Error("Failed to find user {} in group: User {} not found"))
+				for (let u = 0; u < this.fakeGroups[i].users.length; ++u) {
+					if (this.fakeGroups[i].users[u].id == userId) {
+						delete this.fakeGroups[i].users[u]
+						break
+					}
 				}
-
-				return of(group)
+				for (let u = 0; u < this.fakeGroups[i].simpleUsers.length; ++u) {
+					if (this.fakeGroups[i].simpleUsers[u].tempId == userId) {
+						delete this.fakeGroups[i].simpleUsers[u]
+						break
+					}
+				}
 			}
-		})
+		}
 
 		// Error
 		return of(Group.Error("Failed to find group {}: Group {} not found"))
@@ -102,21 +96,19 @@ export class GroupService {
 
 	removeSimpleUser(groupId: number, simpleUserId: number): Observable<Group> {
 		// Search group
-		this.fakeGroups.forEach(group => {
-			if (group.id == groupId) {
-				// Add User
-				let idx: number = group.simpleUsers.findIndex(simpleUser => simpleUser.tempId == simpleUserId)
+		for (let i = 0; i < this.fakeGroups.length; ++i) {
+			if (this.fakeGroups[i].id == groupId) {
 
-				if (idx > -1) {
-					delete group.users[idx]
-				} else {
-					// loggerService.logError("Failed to remove user: User {} not found in group {}")
-					return of(Group.Error("Failed to find user {} in group: User {} not found"))
+				for (let u = 0; u < this.fakeGroups[i].simpleUsers.length; ++u) {
+					if (this.fakeGroups[i].simpleUsers[u].tempId == simpleUserId) {
+						delete this.fakeGroups[i].simpleUsers[u]
+						return of(this.fakeGroups[i])
+					}
 				}
 
-				return of(group)
+				return of(Group.Error("Failed to find user {} in group: User {} not found"))
 			}
-		})
+		}
 
 		// Error
 		return of(Group.Error("Failed to find group: Group not found"))
@@ -131,39 +123,50 @@ export class GroupService {
 			new Group(4, "Group 5"),
 		]
 
-
 		return of(groups)
 	}
 
-	createTransaction(groupId: number, transaction: Transaction): Observable<Group> {
-		this.fakeGroups.forEach(group => {
-			if (group.id == groupId) {
-				// let transaction: Transaction = new Transaction()
-				// Insert transaction
-				group.transactions.push(transaction)
-				return of(group)
+	createTransaction(groupId: number, transactionName: string, payeeId: number, amount: number): Observable<Group> {
+		// 
+		for (let i = 0; i < this.fakeGroups.length; ++i) {
+			if (this.fakeGroups[i].id = groupId) {
+				this.fakeGroups[i].transactions.push(new Transaction(transactionName, groupId, this.fakeGroups[i].transactions.length, [], payeeId, amount, -1))
+				return of(this.fakeGroups[i])
 			}
-		})
+		}
+
 		return of(Group.Error("Group {} not found"))
 	}
 
-	getTransaction(groupId: number, transactionId: number): Observable<Transaction> {
-		let transaction: Transaction = new Transaction("Transaction 1", groupId, -1, [], 0, 50, 0)
+	createTransactionSpecific(groupId: number, transactionName: string, payeeId: number, amount: number, memberIds: number[]) {
 
+	}
+
+	getTransaction(groupId: number, transactionId: number): Observable<Transaction> {
+		// Search
+		let transaction: Transaction = new Transaction("Transaction 1", groupId, -1, [], 0, 50, 0)
+		for (let i = 0; i < this.fakeGroups.length; ++i) {
+			if (this.fakeGroups[i].id == groupId) {
+				for (let u = 0; u < this.fakeGroups[i].transactions.length; ++u) {
+					if (this.fakeGroups[i].transactions[u].id == transactionId) {
+						return of(this.fakeGroups[i].transactions[u])
+					}
+				}
+			}
+		}
 		return of(transaction)
 	}
 
 	updateTransaction(groupId: number, transaction: Transaction): Observable<Boolean> {
 		// Search
-		this.fakeGroups.forEach(group => {
-			if (group.id == groupId) {
-				group.transactions.forEach(_transaction => {
-					if (transaction.id == _transaction.id) {
-
-					}
-				})
+		for (let i = 0; i < this.fakeGroups.length; ++i) {
+			if (this.fakeGroups[i].id == groupId) {
+				for (let u = 0; u < this.fakeGroups[i].transactions.length; ++u) {
+					this.fakeGroups[i].transactions[u] = transaction
+					return of(true)
+				}
 			}
-		})
+		}
 
 		// Update
 		return of(false)
@@ -171,76 +174,93 @@ export class GroupService {
 
 	deleteTransaction(groupId: number, transactionId: number): Observable<Boolean> {
 		// Search
+		for (let i = 0; i < this.fakeGroups.length; ++i) {
+			if (this.fakeGroups[i].id == groupId) {
+
+				for (let u = 0; u < this.fakeGroups[i].transactions.length; ++u) {
+					if (this.fakeGroups[i].transactions[u].id == transactionId) {
+						delete this.fakeGroups[i].transactions[u]
+						break
+					}
+				}
+				// No need to continue
+				break
+			}
+		}
 
 		// Delete
 		return of(false)
 	}
 
 	getTransactions(groupId: number): Observable<Transaction[]> {
-		let transactions: Transaction[] = [
-			{
-				name: "First time at McDonalds",
-				groupId: 0,
-				id: 0,
-				member_ids: [],
-				payee_id: 0,
-				amount: 110,
+		// let transactions: Transaction[] = [
+		// 	{
+		// 		name: "First time at McDonalds",
+		// 		groupId: 0,
+		// 		id: 0,
+		// 		member_ids: [],
+		// 		payee_id: 0,
+		// 		amount: 110,
 
-				currency_id: 0,
-				comments: [],
-				datetime: new Date(),
-			},
-			{
-				name: "Kentucky Birthday Party",
-				groupId: 0,
-				id: 1,
-				member_ids: [],
-				payee_id: 0,
-				amount: 40,
+		// 		currency_id: 0,
+		// 		comments: [],
+		// 		datetime: new Date(),
+		// 	},
+		// 	{
+		// 		name: "Kentucky Birthday Party",
+		// 		groupId: 0,
+		// 		id: 1,
+		// 		member_ids: [],
+		// 		payee_id: 0,
+		// 		amount: 40,
 
-				currency_id: 0,
-				comments: [],
-				datetime: new Date(),
-			},
-			{
-				name: "10 Grab sessions",
-				groupId: 0,
-				id: 2,
-				member_ids: [],
-				payee_id: 0,
-				amount: 31,
+		// 		currency_id: 0,
+		// 		comments: [],
+		// 		datetime: new Date(),
+		// 	},
+		// 	{
+		// 		name: "10 Grab sessions",
+		// 		groupId: 0,
+		// 		id: 2,
+		// 		member_ids: [],
+		// 		payee_id: 0,
+		// 		amount: 31,
 
-				currency_id: 0,
-				comments: [],
-				datetime: new Date(),
-			},
-			{
-				name: "Makeup Remover",
-				groupId: 0,
-				id: 3,
-				member_ids: [],
-				payee_id: 0,
-				amount: 26.5,
+		// 		currency_id: 0,
+		// 		comments: [],
+		// 		datetime: new Date(),
+		// 	},
+		// 	{
+		// 		name: "Makeup Remover",
+		// 		groupId: 0,
+		// 		id: 3,
+		// 		member_ids: [],
+		// 		payee_id: 0,
+		// 		amount: 26.5,
 
-				currency_id: 0,
-				comments: [],
-				datetime: new Date(),
-			},
-			{
-				name: "Credit Card Bonus",
-				groupId: 0,
-				id: 4,
-				member_ids: [],
-				payee_id: 0,
-				amount: -100,
+		// 		currency_id: 0,
+		// 		comments: [],
+		// 		datetime: new Date(),
+		// 	},
+		// 	{
+		// 		name: "Credit Card Bonus",
+		// 		groupId: 0,
+		// 		id: 4,
+		// 		member_ids: [],
+		// 		payee_id: 0,
+		// 		amount: -100,
 
-				currency_id: 0,
-				comments: [],
-				datetime: new Date(),
-			},
-		]
-
-		return of(transactions)
+		// 		currency_id: 0,
+		// 		comments: [],
+		// 		datetime: new Date(),
+		// 	},
+		// ]
+		for (let i = 0; i < this.fakeGroups.length; ++i) {
+			if (this.fakeGroups[i].id == groupId) {
+				return of(this.fakeGroups[i].transactions)
+			}
+		}
+		return of([])
 	}
 
 	getTotal(groupId: number): Observable<number> {
@@ -258,9 +278,11 @@ export class GroupService {
 	/* === Utility === */
 
 	util_getGroup(groupId: number): Group | string {
-		this.fakeGroups.forEach(group => {
-			if (group.id == groupId) return group
-		})
+		for (let i = 0; i < this.fakeGroups.length; ++i) {
+			if (this.fakeGroups[i].id == groupId) {
+				return this.fakeGroups[i]
+			}
+		}
 		return "Group cannot be found"
 	}
 }

@@ -40,3 +40,8 @@ export enum SplitMode {
 
 	Random = 9,
 }
+
+export enum PayStyle {
+	All,
+	Specific,
+}
