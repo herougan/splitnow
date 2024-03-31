@@ -1,7 +1,5 @@
-// Complete all services on the backend first
-// Display transactions
-// Move code to "page" ts (Separate ui logic from backend logic)
-// Split into sub components
+// User, SimpleUser, or NonUser? - Users with just their user_code - no name. Users with just name (&ip/mac-addr), full on Users, google sign-on Users
+// The app needs to be able to handle all kinds
 
 
 [Splitter's Journey]

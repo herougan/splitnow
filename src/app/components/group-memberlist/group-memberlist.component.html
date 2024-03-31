@@ -1,0 +1,35 @@
+<p>group-memberlist works!</p>
+<div class="dashboard__group-empty-new-form__member-list">
+	<!-- Users -->
+	<tr *ngFor="let member of currentGroup.users;let i = index">
+		<td>
+			<div id="member-{{i}}" class="member-row items-center px-1 flex place-content-between">
+				<ng-container *ngIf="member.id > -1">
+					<div class="member-row-text is_member user-link">{{member.name}}</div>
+					<!-- routerlink="" target="_blank"-->
+					<div id="member-del-{{i}}" class="member-row-del" (click)="removeMember(i)"></div>
+				</ng-container>
+				<ng-template #non_user>
+					<div class="member-row-text">{{member.name}}</div>
+					<div id="member-del-{{i}}" class="member-row-del" (click)="removeMember(i)"></div>
+				</ng-template>
+			</div>
+		</td>
+	</tr>
+	<!-- SimpleUser -->
+	<tr *ngFor="let member of currentGroup.simpleUsers;let i = index">
+		<td>
+			<div id="member-{{i}}" class="member-row items-center px-1 flex place-content-between">
+				<ng-container *ngIf="member.tempId > -1">
+					<div class="member-row-text is_member user-link">{{member.name}}</div>
+					<!-- routerlink="" target="_blank"-->
+					<div id="member-del-{{i}}" class="member-row-del" (click)="removeMember(i)"></div>
+				</ng-container>
+				<ng-template #non_user>
+					<div class="member-row-text">{{member.name}}</div>
+					<div id="member-del-{{i}}" class="member-row-del" (click)="removeMember(i)"></div>
+				</ng-template>
+			</div>
+		</td>
+	</tr>
+</div>

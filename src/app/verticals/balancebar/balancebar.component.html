@@ -1,0 +1,19 @@
+<p>balancebar works!</p>
+
+<div class="dashboard__balance-bar flex-col"
+	[ngClass]="{'red': person.balance > 0, 'green': person.balance < 0, 'grey': person.balance == 0}">
+	<!-- === Title === -->
+	Balance: {{ person.balance | accountingFormat }}
+	<!-- === Content === -->
+	<div class="dashboard__balance-content flex flex-col place-content-center items-center"></div>
+
+	<!-- === New Button === -->
+	<!-- <div *ngIf="newGroupFlag">
+		<button class="dashboard__balance-new-group" type="button" mat-fab extended (click)="selectedName()">
+
+		</button>
+	</div> -->
+
+	<!-- Member List -->
+	<app-group-memberlist></app-group-memberlist>
+</div>

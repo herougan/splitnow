@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { Group } from '../structures/group';
+import { Group } from '../../structures/group';
 import { CommonModule, JsonPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
-import { User } from '../structures/user';
-import { Transaction } from '../structures/transaction';
+import { User } from '../../structures/user';
+import { Transaction } from '../../structures/transaction';
 
 @Component({
 	selector: 'app-new-group-form',

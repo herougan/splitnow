@@ -1,0 +1,17 @@
+<p>groups works!</p>
+<ng-container *ngIf="groups.length > 0"
+	class="dashboard__group-content-inner flex flex-row place-content-center items-center">
+	<div *ngFor="let group of groups">
+		{{group|json}}
+	</div>
+	<div class="dashboard__group-new">
+		<button class="dashboard__group-new-group" type="button" mat-fab extended (click)="selectGroup()">
+			New
+		</button>
+	</div>
+	<div *ngIf="editGroupFlag">
+		<!-- <app-new-group-form search></app-new-group-form> -->
+	</div>
+</ng-container>
+<!-- New group form should consist of the whole form process - then action at the end -->
+<!-- TODO This is the list of groups section, NOT the new group form section -->

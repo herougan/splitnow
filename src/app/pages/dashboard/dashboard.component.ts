@@ -1,24 +1,28 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AccountingFormatPipe } from '../pipes/accountingFormat';
+import { AccountingFormatPipe } from '../../pipes/accountingFormat';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
-import { NewGroupFormComponent } from '../new-group-form/new-group-form.component';
-import { SimpleUser, User } from '../structures/user';
-import { Group } from '../structures/group';
+import { NewGroupFormComponent } from '../../components/new-group-form/new-group-form.component';
+import { SimpleUser, User } from '../../structures/user';
+import { Group } from '../../structures/group';
 import { JsonPipe } from '@angular/common';
 import gsap from 'gsap';
-import { UserService } from '../service/user/user.service';
-import { Transaction } from '../structures/transaction';
-import { ForexAccountingFormatPipe } from '../pipes/forexAccFormat';
-import { GroupService } from '../service/group/group.service';
+import { UserService } from '../../service/user/user.service';
+import { Transaction } from '../../structures/transaction';
+import { ForexAccountingFormatPipe } from '../../pipes/forexAccFormat';
+import { GroupService } from '../../service/group/group.service';
+import { SidebarComponent } from "../../verticals/sidebar/sidebar.component";
+import { PersonbarComponent } from "../../verticals/personbar/personbar.component";
+import { GroupbarComponent } from "../../verticals/groupbar/groupbar.component";
+import { BalancebarComponent } from "../../verticals/balancebar/balancebar.component";
 
 @Component({
 	selector: 'app-dashboard',
 	standalone: true,
 	templateUrl: './dashboard.component.html',
 	styleUrl: './dashboard.component.sass',
-	imports: [CommonModule, AccountingFormatPipe, ForexAccountingFormatPipe, NewGroupFormComponent, FormsModule, ReactiveFormsModule, JsonPipe]
+	imports: [CommonModule, AccountingFormatPipe, ForexAccountingFormatPipe, NewGroupFormComponent, FormsModule, ReactiveFormsModule, JsonPipe, SidebarComponent, PersonbarComponent, GroupbarComponent, BalancebarComponent]
 })
 
 export class DashboardComponent {

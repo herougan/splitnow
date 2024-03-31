@@ -1,5 +1,44 @@
 <p>transactions works!</p>
-<div *ngFor="let transaction of transactions">
-	<div></div>
-	<div></div>
+
+<div class="dashboard__group-transaction-list flex flex-col items-center">
+	<div class="transactions flex flex-col">
+		<div *ngFor="let transaction of transactions; let i = index" class="transaction rounded m-1 flex flex-col">
+			<div class="transaction-row-{{i}} flex flex-row place-content-between">
+				<div class="transaction-name">{{ transaction.name }}</div>
+				<div class="flex flex-row">
+					<div class="transaction-owner-img"><!--{{ transaction.user.img  | imgify}}--></div>
+					<div class="transaction-amount">{{ transaction.amount| forexAccFormat:
+						transaction.currency_id }}</div>
+				</div>
+			</div>
+			<div class="transaction-row-2 flex place-content-start">
+				<div class="transaction-date">{{ transaction.datetime }}</div>
+			</div>
+
+			<!-- Transaction Context :hover -->
+			<div class="transaction-context-menu">
+				<div class="transaction-context-edit-button"></div>
+				<div class="transaction-context-hamburger-button"></div>
+				<div class="transaction-context-location-button"></div>
+			</div>
+			<!-- Expanded Content -->
+			<div class="transaction-details">
+
+			</div>
+		</div>
+	</div>
+	<!-- New Button -->
+	<div class="transaction-button rounded m-1 flex flex-col items-center justify-center">
+		<div class="transaction-row-1 flex flex-row" (click)="createTransaction()">
+			New
+		</div>
+	</div>
+</div>
+<!-- --- Create Transaction --- -->
+<div class="dashboard__group-transaction-create flex flex-col items-center">
+	<form>
+		<input placeholder="Info here">
+		<input placeholder="Info here">
+		<input placeholder="Info here">
+	</form>
 </div>

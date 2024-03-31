@@ -1,16 +1,15 @@
 <div>
+	<!-- TODO Useless remove -->
 	{{ model | json }}
-	
+	<!-- What is this? -->
 	<div class="newGroupForm" *ngIf="activated">
 		<div class="form-group">
 			<label for="name">Name</label>
-			<input type="text" class="form-control" id="name"
-				   required
-				   [(ngModel)]="model.name" name="name"
-				   #name="ngModel">
+			<input type="text" class="form-control" id="name" required [(ngModel)]="model.name" name="name"
+				#name="ngModel">
 			Name is required
 		</div>
-		
+
 		<div class="form-group">
 			<label for="transaction">Transactions</label>
 			<div *ngFor="let transaction of model.transactions">
@@ -26,7 +25,7 @@
 			  Transactions are required
 			</div> -->
 		</div>
-		
+
 		<div class="form-group">
 			<label for="member">Members</label>
 			<div *ngFor="let user of model.users">
@@ -36,6 +35,6 @@
 	</div>
 
 	<div class="newGroup__addPeopleSection" *ngIf="activated && activated__addPeople">
-		
+
 	</div>
 </div>

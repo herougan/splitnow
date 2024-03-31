@@ -1,1 +1,54 @@
 <p>friends works!</p>
+
+<div *ngIf="groups.length > 0" class="dashboard__person-content flex flex-col place-content-center items-center">
+
+	<div class="dashboard__friends-label">Friends</div>
+
+	<div class="dashboard__friends-container flex flex-col">
+		<div *ngIf="friends.length > 0; then list_friends else empty_friends"></div>
+		<!-- No friends -->
+		<ng-template #empty_friends>
+			<div class="flex flex-col place-content-center">
+				<div class="dashboard__friends-empty-add-new place-self-center">
+					<input type="text" class="form-control" id="name" required placeholder="Add a new friend!"
+						onforminput="addFriendInput" [(ngModel)]="newFriendTemp.name" name="name">
+				</div>
+				<div *ngIf="newFriendTemp.name != ''"
+					class="dashboard__friends-empty-add-new-context flex flex-col place-items-center">
+					<div class="add-friend-context">Add "{{newFriendTemp.name}}"</div>
+					<div class="add-friend-context" *ngFor="let result of friendSearchResults">
+						{{result.name}}
+					</div>
+				</div>
+			</div>
+		</ng-template>
+
+		<!-- At least one friend -->
+		<ng-template #list_friends>
+			<div *ngFor="let friend of friends">
+				<div class="dashboard__friend-item">{{friend.name}}</div>
+			</div>
+			<div>Add another friend...</div>
+			<div class="flex flex-col place-content-center">
+				<div class="dashboard__friends-empty-add-new place-self-center">
+					<input type="text" class="form-control" id="name" required placeholder="Add a new friend!"
+						onforminput="newFriendCreateContext" [(ngModel)]="newFriendTemp.name" name="name">
+				</div>
+				<div *ngIf="newFriendTemp.name != ''"
+					class="dashboard__friends-empty-add-new-context flex flex-col place-items-center">
+					<div class="add-friend-context">Add "{{newFriendTemp.name}}"</div>
+					<div class="add-friend-context" *ngFor="let result of friendSearchResults">
+						{{result.name}}
+					</div>
+				</div>
+			</div>
+		</ng-template>
+	</div>
+
+	<div class="dashboard__recent-friend-label" *ngIf="friends.length > 0">
+		Recent activity
+	</div>
+	<div class="dashboard__recent-container">
+
+	</div>
+</div>
