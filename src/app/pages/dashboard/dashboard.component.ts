@@ -16,13 +16,14 @@ import { SidebarComponent } from "../../verticals/sidebar/sidebar.component";
 import { PersonbarComponent } from "../../verticals/personbar/personbar.component";
 import { GroupbarComponent } from "../../verticals/groupbar/groupbar.component";
 import { BalancebarComponent } from "../../verticals/balancebar/balancebar.component";
+import { CreateFirstGroupComponent } from "../../components/create-first-group/create-first-group.component";
 
 @Component({
 	selector: 'app-dashboard',
 	standalone: true,
 	templateUrl: './dashboard.component.html',
 	styleUrl: './dashboard.component.sass',
-	imports: [CommonModule, AccountingFormatPipe, ForexAccountingFormatPipe, NewGroupFormComponent, FormsModule, ReactiveFormsModule, JsonPipe, SidebarComponent, PersonbarComponent, GroupbarComponent, BalancebarComponent]
+	imports: [CommonModule, AccountingFormatPipe, ForexAccountingFormatPipe, NewGroupFormComponent, FormsModule, ReactiveFormsModule, JsonPipe, SidebarComponent, PersonbarComponent, GroupbarComponent, BalancebarComponent, CreateFirstGroupComponent]
 })
 
 export class DashboardComponent {
@@ -124,7 +125,8 @@ export class DashboardComponent {
 	addFriendInput(): void {
 		this.friendFound = false
 		if (this.newFriendTemp.name == "") {
-
+			console.log("Fail")
+			return
 		}
 		console.log(`Create a new friend named ${this.newFriendTemp.name}`)
 		if (this.friends.length > 0)
@@ -137,7 +139,7 @@ export class DashboardComponent {
 	accountSearchResult: User = new User(0, "");
 
 	searchFriends(phrase: string): void {
-		this.userService.searchFriends(this.user, phrase).subscribe(results => this.friendSearchResults = results)
+		this.userService.searchFriends(this.user.id, phrase).subscribe(results => this.friendSearchResults = results)
 	}
 
 	searchUser(exact: string): void {

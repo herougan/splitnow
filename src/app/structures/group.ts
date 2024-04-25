@@ -48,10 +48,27 @@ export class Group {
 	) { }
 
 	static Empty(): Group {
-		return new Group(-1, "Empty")
+		return new Group(-1, "")
 	}
 
 	static Error(error: string): Group {
 		return new Group(-1, error)
+	}
+
+	get size(): number {
+		return this.users.length + this.simpleUsers.length
+	}
+
+	*iterateUsers() {
+		for (let i = 0; i < this.users.length; ++i) {
+			yield this.users[i]
+		}
+		for (let i = 0; i < this.simpleUsers.length; ++i) {
+			yield this.simpleUsers[i]
+		}
+	}
+
+	nextNonUserID(): number {
+		return this.simpleUsers.length
 	}
 }

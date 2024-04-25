@@ -1,0 +1,100 @@
+@tailwind base
+@tailwind components
+@tailwind utilities
+
+@import "../../../common"
+
+/* #region Group bar Middle */
+.dashboard__group-title
+	margin-bottom: 5vh
+
+.dashboard__group-bar
+	width: 40vw
+	height: 100%
+
+.dashboard__group-new
+	border-radius: 25px
+	height: 50px
+	width: 50px
+	background-color: $light
+	text-align: center
+	justify-content: center
+	display: flex
+
+.dashboard__group-content
+	// height: 20vh
+
+.dashboard__group-content-inner
+	height: 20vh
+
+.dashboard__group-empty-add-new
+	width: 10vw
+
+	input
+		width: 10vw
+
+.add-group-context
+	width: 10vw
+	background-color: $white
+
+.dashboard__group-add-new-context
+	position: absolute
+
+// Add new Form
+.dashboard__group-empty-new-form__two-context
+	position: absolute
+	background-color: white
+	width: 200px
+	text-overflow: clip
+	overflow: hidden
+	white-space: nowrap
+	// height: 20px
+
+	&.highlight
+		border-top: 1px solid rgba(0.4, 0.4, 0.4, 0.4)
+
+	.suggestion-row
+		// border: 1px solid black
+		// padding: -1px
+		cursor: pointer
+
+.dashboard__group-empty-new-form__two-input
+	width: 200px
+
+.dashboard__group-empty-new-form__two-input__warning
+	width: 200px
+
+.dashboard__group-new-form-empty
+	background-color: $light-secondary
+
+.dashboard__group-transaction-create
+	background-color: $light-secondary
+	width: 300px
+	height: 200px
+
+.member-row
+	width: 200px
+	height: 30px
+	background-color: $offwhite
+	vertical-align: middle
+
+	.member-row-del
+		width: 25px
+		height: 25px
+
+		background-image: url("../../../assets/static/resources/img/cancel_grey.png")
+		background-size: 100% 100%
+
+		&:hover
+			background-image: url('../../../assets/static/resources/img/cancel.png')
+			background-size: 100% 100%
+
+	.member-row-text
+		width: 170px
+		text-overflow: ellipsis
+		overflow: hidden
+
+		&.is_member:hover
+			color: $cyan-500
+
+/* #endregion */

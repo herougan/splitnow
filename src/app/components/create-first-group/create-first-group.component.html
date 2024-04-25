@@ -1,19 +1,25 @@
 <p>create-first-group works!</p>
-
+<!-- Template driven: https://ultimatecourses.com/blog/angular-2-forms-template-driven -->
+<!-- Reactive driven: https://ultimatecourses.com/blog/angular-2-forms-reactive -->
 <ng-container class="dashboard__group-content-inner">
-	<form #groupForm="ngForm" *ngIf="state == UIState.EnterName">
-		<div class="dashboard__group-new-form flex flex-col place-content-center space-y-5">
+	<!-- Entry point: Enter name! -->
+	<form #enterNameForm="ngForm" *ngIf="state == UIState.EnterName">
+		<div class="dashboard__group-new-form flex flex-col place-content-center space-y-5 align-middle">
 			<div class="dashboard__group-new-form-label">What is your group's name?</div>
 			<div class="dashboard__friends-empty-add-new place-self-center">
 				<input type="text" class="form-control" id="name" required placeholder="Enter name..."
-					onforminput="newGroupCreateContext" [(ngModel)]="templateGroup.name" name="name">
+					onforminput="newGroupCreateContext" [(ngModel)]="object.templateGroup.name" name="name">
+				<div *ngIf="!validator.pass" class="dashboard__group-empty-new-form__two-input__warning input_warning">
+					{{
+					validator.error.msg }}</div>
 			</div>
-			<div class="row animated fadeIn" ng-show="templateGroup.name != ''">
+			<div class="row animated fadeIn" ng-show="object.templateGroup.name != ''">
 				<div
 					class="animated fadeInLeft dashboard__group-empty-add-new-context flex flex-col place-items-center">
 					<button (click)="selectName()" type="submit" id="new_group"
 						class="bg-cyan-500 rounded py-2 px-3 text-white cyan-button"
-						[ngClass]="{'btn-disabled': templateGroup.name == ''}" [disabled]="templateGroup.name == ''">
+						[ngClass]="{'btn-disabled': object.templateGroup.name == ''}"
+						[disabled]="object.templateGroup.name == ''">
 						Start Sharing!
 					</button>
 				</div>
@@ -23,16 +29,33 @@
 			</div>
 		</div>
 	</form>
-	<form #groupForm2="ngForm" *ngIf="state == UIState.AddMembers">
-		<div class="dashboard__group-empty-new-form__two flex flex-col place-content-center items-center space-y-5">
-			<div for="" class="dashboard__group-empty-new-form__two-label">Add the members of your group
+	<!-- Join group instead (from friends) -->
+	<form #joinGroupForm="ngForm" *ngIf="state == UIState.SearchGroups">
+		<!-- Insert code -->
+		<div>
+			<!-- Input -->
+			<input type="text" class="form-control dashboard__search_group-input" id="name" required
+				placeholder="Enter Group ID..." (keyup)="addMember__onInput" [(ngModel)]="object.templateMember.name"
+				name="name" #name="ngModel" #friendNameInput>
+			<!-- Cancel -->
+			<div (click)="cancelJoining" class="text-cyan-500 cyan-title mt-2">
+				Back
 			</div>
+		</div>
+	</form>
+	<!-- Add members -->
+	<form #addMemberForm="ngForm" *ngIf="state == UIState.AddMembers">
+		<div class="dashboard__group-empty-new-form__two flex flex-col place-content-center items-center space-y-5">
+			<div class="dashboard__group-addMember__title"></div>
+			<div for="" class="dashboard__group-empty-new-form__two-label">Add the members of your group!</div>
 			<div class="place-self-center dashboard__group-empty-new-form-container" (focusout)="addMember__loseFocus()"
 				tabindex="-1"> <!-- flex flex-col -->
 				<!-- Input -->
 				<input type="text" class="form-control dashboard__group-empty-new-form__two-input" id="name" required
-					placeholder="Name or Email" (keyup)="addMember__onInput" [(ngModel)]="templateMember.name"
+					placeholder="Name or Email" (keyup)="addMember__onInput" [(ngModel)]="object.templateString"
 					name="name" #name="ngModel" #friendNameInput>
+				<div *ngIf="!validator.pass" class="dashboard__group-empty-new-form__two-input__warning">{{
+					validator.error.msg }}</div>
 				<!-- Context -->
 				<div class="dashboard__group-empty-new-form__two-context" [ngClass]="{'highlight': name.value}">
 					<!-- Search for friends -->
@@ -68,7 +91,7 @@
 			<!-- Current Member List -->
 			<div class="dashboard__group-empty-new-form__member-list">
 				<!-- Users -->
-				<tr *ngFor="let member of templateGroup.users;let i = index">
+				<tr *ngFor="let member of object.templateGroup.users;let i = index">
 					<td>
 						<div id="member-{{i}}" class="member-row items-center px-1 flex place-content-between">
 							<ng-container *ngIf="member.id > -1">
@@ -86,7 +109,7 @@
 					</td>
 				</tr>
 				<!-- SimpleUser -->
-				<tr *ngFor="let member of templateGroup.simpleUsers;let i = index">
+				<tr *ngFor="let member of object.templateGroup.simpleUsers;let i = index">
 					<td>
 						<div id="member-{{i}}" class="member-row items-center px-1 flex place-content-between">
 							<ng-container *ngIf="member.tempId > -1">
@@ -117,7 +140,8 @@
 		</div>
 	</form>
 	<!-- Are you sure you want to build an empty group? -->
-	<form class="dashboard__group-new-form-empty py-7 px-4 rounded-sm" *ngIf="state == UIState.EmptyGroupDialogue">
+	<form #emptyGroupDialogue="ngForm" class="dashboard__group-new-form-empty py-7 px-4 rounded-sm"
+		*ngIf="state == UIState.EmptyGroupDialogue">
 		<div>
 			Are you sure you want to create an empty group?
 		</div>
@@ -133,12 +157,17 @@
 		</div>
 	</form>
 	<!-- Group Created! -->
-	<div class="dashboard__group-create-success">
+	<form #groupCreatedDialogue="ngForm" class="dashboard__group-create-success">
 		<div *ngIf="state == UIState.Created">
 			Congratulations! Your group has been created!
 		</div>
 		<div>
 			<button></button>
 		</div>
-	</div>
+	</form>
+
+	<!-- Error Dialogue -->
+	<form #errorDialogue="ngForm" class="error_dialouge">
+
+	</form>
 </ng-container>

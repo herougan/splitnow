@@ -3,27 +3,30 @@ import { Transaction } from '../../structures/transaction';
 import { Observable, of } from 'rxjs';
 import { Group } from '../../structures/group';
 import { SimpleUser, User } from '../../structures/user';
+import { GROUPS } from '../../../assets/static/test/data_one';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class GroupService {
 
-	fakeGroups: Group[] = []
+	tempGroups: Group[] = []
 
-	constructor() { }
+	constructor() {
+		this.tempGroups = GROUPS
+	}
 
 	// CDU
 	createGroup(group: Group): Observable<Group> {
-		group.id = this.fakeGroups.length + 1	// How do we set IDs? Let the database handle it. Create it in the db and take the id back.
-		this.fakeGroups.push(group)
+		group.id = this.tempGroups.length + 1	// How do we set IDs? Let the database handle it. Create it in the db and take the id back.
+		this.tempGroups.push(group)
 		return of(group)
 	}
 
 	deleteGroup(groupId: number): Observable<Boolean> {
-		let idx: number = this.fakeGroups.findIndex(group => group.id = groupId)
+		let idx: number = this.tempGroups.findIndex(group => group.id = groupId)
 		if (idx > -1) {
-			delete this.fakeGroups[idx]
+			delete this.tempGroups[idx]
 			return of(true)
 		} else {
 			return of(false)
@@ -32,24 +35,34 @@ export class GroupService {
 
 	updateGroup(group: Group): Observable<Group> {
 		// Search Group
-		for (let i = 0; i < this.fakeGroups.length; ++i) {
-			if (this.fakeGroups[i].id == group.id) {
-				this.fakeGroups[i] = group
-				return of(this.fakeGroups[i])
+		for (let i = 0; i < this.tempGroups.length; ++i) {
+			if (this.tempGroups[i].id == group.id) {
+				this.tempGroups[i] = group
+				return of(this.tempGroups[i])
 			}
 		}
 
 		return of(Group.Error("Could not find Group!"))
 	}
 
+	searchGroup(searchTerm: string): Observable<Boolean | Group> {
+		for (let i = 0; i < this.tempGroups.length; ++i) {
+			if (this.tempGroups[i].name == searchTerm) {
+				return of(this.tempGroups[i])
+			}
+		}
+
+		return of(false)
+	}
+
 	addUser(groupId: number, userId: number): Observable<Group> {
 		// Search Group
-		for (let i = 0; i < this.fakeGroups.length; ++i) {
-			if (this.fakeGroups[i].id == groupId) {
-				this.fakeGroups[i].users.push(
+		for (let i = 0; i < this.tempGroups.length; ++i) {
+			if (this.tempGroups[i].id == groupId) {
+				this.tempGroups[i].users.push(
 					new User(-1, "New User") // TODO
 				)
-				return of(this.fakeGroups[i])
+				return of(this.tempGroups[i])
 			}
 		}
 
@@ -58,9 +71,9 @@ export class GroupService {
 
 	addSimpleUser(groupId: number, name: string): Observable<Group> {
 		// Search Group
-		for (let i = 0; i < this.fakeGroups.length; ++i) {
-			if (this.fakeGroups[i].id == groupId) {
-				this.fakeGroups[i].simpleUsers.push(
+		for (let i = 0; i < this.tempGroups.length; ++i) {
+			if (this.tempGroups[i].id == groupId) {
+				this.tempGroups[i].simpleUsers.push(
 					new SimpleUser("", -1) // TODO
 				)
 			}
@@ -72,18 +85,18 @@ export class GroupService {
 
 	removeUser(groupId: number, userId: number): Observable<Group> {
 		// Search group
-		for (let i = 0; i < this.fakeGroups.length; ++i) {
-			if (this.fakeGroups[i].id == groupId) {
+		for (let i = 0; i < this.tempGroups.length; ++i) {
+			if (this.tempGroups[i].id == groupId) {
 				// Add User
-				for (let u = 0; u < this.fakeGroups[i].users.length; ++u) {
-					if (this.fakeGroups[i].users[u].id == userId) {
-						delete this.fakeGroups[i].users[u]
+				for (let u = 0; u < this.tempGroups[i].users.length; ++u) {
+					if (this.tempGroups[i].users[u].id == userId) {
+						delete this.tempGroups[i].users[u]
 						break
 					}
 				}
-				for (let u = 0; u < this.fakeGroups[i].simpleUsers.length; ++u) {
-					if (this.fakeGroups[i].simpleUsers[u].tempId == userId) {
-						delete this.fakeGroups[i].simpleUsers[u]
+				for (let u = 0; u < this.tempGroups[i].simpleUsers.length; ++u) {
+					if (this.tempGroups[i].simpleUsers[u].tempId == userId) {
+						delete this.tempGroups[i].simpleUsers[u]
 						break
 					}
 				}
@@ -96,13 +109,13 @@ export class GroupService {
 
 	removeSimpleUser(groupId: number, simpleUserId: number): Observable<Group> {
 		// Search group
-		for (let i = 0; i < this.fakeGroups.length; ++i) {
-			if (this.fakeGroups[i].id == groupId) {
+		for (let i = 0; i < this.tempGroups.length; ++i) {
+			if (this.tempGroups[i].id == groupId) {
 
-				for (let u = 0; u < this.fakeGroups[i].simpleUsers.length; ++u) {
-					if (this.fakeGroups[i].simpleUsers[u].tempId == simpleUserId) {
-						delete this.fakeGroups[i].simpleUsers[u]
-						return of(this.fakeGroups[i])
+				for (let u = 0; u < this.tempGroups[i].simpleUsers.length; ++u) {
+					if (this.tempGroups[i].simpleUsers[u].tempId == simpleUserId) {
+						delete this.tempGroups[i].simpleUsers[u]
+						return of(this.tempGroups[i])
 					}
 				}
 
@@ -128,10 +141,10 @@ export class GroupService {
 
 	createTransaction(groupId: number, transactionName: string, payeeId: number, amount: number): Observable<Group> {
 		// 
-		for (let i = 0; i < this.fakeGroups.length; ++i) {
-			if (this.fakeGroups[i].id = groupId) {
-				this.fakeGroups[i].transactions.push(new Transaction(transactionName, groupId, this.fakeGroups[i].transactions.length, [], payeeId, amount, -1))
-				return of(this.fakeGroups[i])
+		for (let i = 0; i < this.tempGroups.length; ++i) {
+			if (this.tempGroups[i].id = groupId) {
+				this.tempGroups[i].transactions.push(new Transaction(transactionName, groupId, this.tempGroups[i].transactions.length, [], payeeId, amount, -1))
+				return of(this.tempGroups[i])
 			}
 		}
 
@@ -145,11 +158,11 @@ export class GroupService {
 	getTransaction(groupId: number, transactionId: number): Observable<Transaction> {
 		// Search
 		let transaction: Transaction = new Transaction("Transaction 1", groupId, -1, [], 0, 50, 0)
-		for (let i = 0; i < this.fakeGroups.length; ++i) {
-			if (this.fakeGroups[i].id == groupId) {
-				for (let u = 0; u < this.fakeGroups[i].transactions.length; ++u) {
-					if (this.fakeGroups[i].transactions[u].id == transactionId) {
-						return of(this.fakeGroups[i].transactions[u])
+		for (let i = 0; i < this.tempGroups.length; ++i) {
+			if (this.tempGroups[i].id == groupId) {
+				for (let u = 0; u < this.tempGroups[i].transactions.length; ++u) {
+					if (this.tempGroups[i].transactions[u].id == transactionId) {
+						return of(this.tempGroups[i].transactions[u])
 					}
 				}
 			}
@@ -159,10 +172,10 @@ export class GroupService {
 
 	updateTransaction(groupId: number, transaction: Transaction): Observable<Boolean> {
 		// Search
-		for (let i = 0; i < this.fakeGroups.length; ++i) {
-			if (this.fakeGroups[i].id == groupId) {
-				for (let u = 0; u < this.fakeGroups[i].transactions.length; ++u) {
-					this.fakeGroups[i].transactions[u] = transaction
+		for (let i = 0; i < this.tempGroups.length; ++i) {
+			if (this.tempGroups[i].id == groupId) {
+				for (let u = 0; u < this.tempGroups[i].transactions.length; ++u) {
+					this.tempGroups[i].transactions[u] = transaction
 					return of(true)
 				}
 			}
@@ -174,12 +187,12 @@ export class GroupService {
 
 	deleteTransaction(groupId: number, transactionId: number): Observable<Boolean> {
 		// Search
-		for (let i = 0; i < this.fakeGroups.length; ++i) {
-			if (this.fakeGroups[i].id == groupId) {
+		for (let i = 0; i < this.tempGroups.length; ++i) {
+			if (this.tempGroups[i].id == groupId) {
 
-				for (let u = 0; u < this.fakeGroups[i].transactions.length; ++u) {
-					if (this.fakeGroups[i].transactions[u].id == transactionId) {
-						delete this.fakeGroups[i].transactions[u]
+				for (let u = 0; u < this.tempGroups[i].transactions.length; ++u) {
+					if (this.tempGroups[i].transactions[u].id == transactionId) {
+						delete this.tempGroups[i].transactions[u]
 						break
 					}
 				}
@@ -255,9 +268,9 @@ export class GroupService {
 		// 		datetime: new Date(),
 		// 	},
 		// ]
-		for (let i = 0; i < this.fakeGroups.length; ++i) {
-			if (this.fakeGroups[i].id == groupId) {
-				return of(this.fakeGroups[i].transactions)
+		for (let i = 0; i < this.tempGroups.length; ++i) {
+			if (this.tempGroups[i].id == groupId) {
+				return of(this.tempGroups[i].transactions)
 			}
 		}
 		return of([])
@@ -266,7 +279,7 @@ export class GroupService {
 	getTotal(groupId: number): Observable<number> {
 		let total: number = 0
 
-		this.fakeGroups.forEach(group => {
+		this.tempGroups.forEach(group => {
 			group.transactions.forEach(transaction => {
 				total += transaction.amount
 			})
@@ -278,9 +291,9 @@ export class GroupService {
 	/* === Utility === */
 
 	util_getGroup(groupId: number): Group | string {
-		for (let i = 0; i < this.fakeGroups.length; ++i) {
-			if (this.fakeGroups[i].id == groupId) {
-				return this.fakeGroups[i]
+		for (let i = 0; i < this.tempGroups.length; ++i) {
+			if (this.tempGroups[i].id == groupId) {
+				return this.tempGroups[i]
 			}
 		}
 		return "Group cannot be found"

@@ -4,23 +4,30 @@ import { Group } from '../../structures/group';
 import { Transaction } from '../../structures/transaction';
 import { Observable } from 'rxjs/internal/Observable';
 import { of } from 'rxjs/internal/observable/of';
+import { FRIENDSHIPS, GROUPS, USERS } from '../../../assets/static/test/data_one';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class UserService {
 
-	fakeUsers: User[] = []
+	tempUsers: User[] = []
+	tempFriendships: [number, number][] = []
 
-	constructor() { }
+	constructor() {
+		// Init
+		this.tempFriendships = FRIENDSHIPS
+		this.tempUsers = USERS
+
+	}
 
 	// CRUD
 
 	createUser(name: string): Observable<User> {
-		let id: number = this.fakeUsers.length
+		let id: number = this.tempUsers.length
 		let user: User = new User(id, name)
 
-		this.fakeUsers.push(user)
+		this.tempUsers.push(user)
 
 		return of(user)
 	}
@@ -68,44 +75,13 @@ export class UserService {
 
 	// Get
 	getGroups(): Observable<Group[]> {
-		let groups: Group[] = [{
-			id: 0,
-			name: "Group 1",
-			deleted: false,
-			//
-			users: [
-				{
-					id: 0,
-					name: "Kam",
-					email: "Kam@Sg.com",
-					friendIds: [],
-				},
-				new User(-1, "Tooketh", [], "checkers@email.com")
-			],
-			simpleUsers: [],
-			userOrder: [],
-			//
-			transactions: [
-				{
-					name: "Transaction User",
-					groupId: 1,
-					id: 10,
-
-					member_ids: [0,],
-					payee_id: 0,
-
-					amount: 1000,
-
-					currency_id: 0,
-
-					comments: [],
-					datetime: new Date(),
-				},
-			],
-			// == Meta ==
-			date: new Date(),
-		},
-		new Group(1, "Group 2")
+		let groups: Group[] = [
+			new Group(0, "Group 1",
+				[
+					new User(0, "Alice"),
+					new User(1, "Bob"),
+				], [], [], [], new Date(), false),
+			new Group(1, "Group 2")
 		]
 		return of(groups);
 	}
@@ -120,7 +96,7 @@ export class UserService {
 		return of(friends)
 	}
 
-	searchFriends(user: User, search: string): Observable<User[]> {
+	searchFriends(user_id: number, search: string): Observable<User[]> {
 		const friends: User[] = []
 
 		return of(friends)
