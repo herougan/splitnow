@@ -25,6 +25,7 @@
     "@angular/platform-browser-dynamic": "^17.0.0",
     "@angular/platform-server": "^17.0.0",
     "@angular/router": "^17.0.0",
+    "@material-tailwind/html": "^2.2.2",
     "@ngrx/store": "^17.1.1",
     "gsap": "^3.12.5",
     "rxjs": "~7.8.0",

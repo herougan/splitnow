@@ -12,7 +12,6 @@ export class User {
 	constructor(
 		public id: number,
 		public name: string,
-		public friendIds: number[] = [],
 		public email?: string,
 
 		public is_guest?: Boolean,

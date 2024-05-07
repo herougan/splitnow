@@ -1,3 +1,7 @@
+@tailwind base
+@tailwind components
+@tailwind utilities
+
 // Colours
 $white: #F9F7F3
 $offwhite: #FEFEFB
@@ -53,3 +57,7 @@ $cyan-700: rgb(14, 116, 144)
 
 .input_warning
 	color: red
+
+// Hide when not loaded
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+  display: none !important

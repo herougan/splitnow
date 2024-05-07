@@ -135,7 +135,7 @@ export class DashboardComponent {
 
 	// === Friends Search ===
 
-	friendSearchResults: User[] = [new User(0, "", [])];
+	friendSearchResults: User[] = [new User(0, "")];
 	accountSearchResult: User = new User(0, "");
 
 	searchFriends(phrase: string): void {

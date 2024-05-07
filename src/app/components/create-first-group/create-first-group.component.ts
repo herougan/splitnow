@@ -1,5 +1,5 @@
 import { CommonModule, JsonPipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Group } from '../../structures/group';
 import { SimpleUser, User } from '../../structures/user';
@@ -29,15 +29,23 @@ export class CreateFirstGroupComponent {
 
 	// Visibility
 	UIState: any = UIState
+	addMember_nonUserNamePass: boolean = false
+
+	// Handles
+	@ViewChild('enterGroupNameInput')
+	enterGroupNameInputElement!: ElementRef;
+	@ViewChild('friendNameInput')
+	friendNameInputElement!: ElementRef;
 
 	// #region == Enter Name ==
 
 	selectName(): void {
-		console.log("New Group");
+		console.log("UI: New Group");
 		/* === Input Validation === */
 		this.validator.validateGroup(this.object.templateGroup)
 		if (!this.validator.pass) {
 			console.log("Invalid Name")
+			this.enterGroupNameInputElement.nativeElement.focus();
 			return
 		}
 		/* === Server Validation === 
@@ -48,6 +56,9 @@ export class CreateFirstGroupComponent {
 			No API calls made
 		*/
 		this.state = UIState.AddMembers
+		setTimeout(() => {
+			this.friendNameInputElement.nativeElement.focus()
+		}, 50)
 	}
 	/*
 	L0: Display error text on input
@@ -76,7 +87,7 @@ export class CreateFirstGroupComponent {
 		if (this.joinGroup_timeoutID)
 			clearTimeout(this.joinGroup_timeoutID);
 		// Search in 0.3s
-		this.joinGroup_timeoutID = setTimeout(this.addMember__updateDisplay, 300);
+		this.joinGroup_timeoutID = setTimeout(this.addMember__updateDisplay, this.addMember_timeoutLength);
 	}
 
 	joinGroup__updateDisplay(): void {
@@ -88,9 +99,15 @@ export class CreateFirstGroupComponent {
 	// #region == Add Members ==
 
 	addMember_timeoutID: ReturnType<typeof setTimeout> | undefined
+	searchResult_friends: User[] = []
+	addMember_timeoutLength: number = 100
 
 	addMember__loseFocus(): void {
 
+	}
+
+	addMember__updateDisplay(): void {
+		// Put function within time out function
 	}
 
 	addMember__onInput(): void {
@@ -98,14 +115,51 @@ export class CreateFirstGroupComponent {
 		if (this.addMember_timeoutID)
 			clearTimeout(this.addMember_timeoutID);
 		// Search in 0.3s
-		this.addMember_timeoutID = setTimeout(this.addMember__updateDisplay, 300);
-	}
+		this.addMember_timeoutID = setTimeout(() => {
+			// Reset
+			this.addMember_nonUserNamePass = false
+			this.searchResult_friends = []
+			if (this.object.templateString.length <= 1) return
 
-	addMember__updateDisplay(): void {
+			if (this.object.templateString.length > 3) this.addMember_nonUserNamePass = true
 
-		// Search friends with that name
+			// Search friends with that name
+			let lowerCase = this.object.templateString.toLowerCase()
+			for (let i = 0; i < this.friends.length; ++i) {
+				if (this.friends[i].name.toLowerCase().includes(lowerCase)) {
+					this.searchResult_friends.push(this.friends[i])
 
-		// Search by ID
+					// Check if already
+					for (let i = 0; i < this.object.templateGroup.users.length; ++i) {
+						if (this.object.templateGroup.users[i]) { }
+					}
+					//
+				}
+			}
+
+			// Search by ID
+			if (!isNaN(+this.object.templateString)) {
+				this.userService.searchByID(+this.object.templateString).subscribe((user: User) => {
+					if (user.id < 0) return
+					for (let i = 0; i < this.searchResult_friends.length; ++i) {
+						if (this.searchResult_friends[i].name == user.name) return
+					}
+					this.searchResult_friends.push(user)
+				})
+			}
+
+			// Search by email
+			// Check if fits pattern:
+			if (this.object.templateString.toLowerCase().match(this.EMAIL_REGEXP)) {
+				this.userService.searchByEmail(this.object.templateString).subscribe((user: User) => {
+					if (user.id < 0) return
+					for (let i = 0; i < this.searchResult_friends.length; ++i) {
+						if (this.searchResult_friends[i].name == user.name) return
+					}
+					this.searchResult_friends.push(user)
+				})
+			}
+		}, this.addMember_timeoutLength);
 	}
 
 	addMember(): void {
@@ -117,6 +171,9 @@ export class CreateFirstGroupComponent {
 
 		// Validate
 		let name = this.object.templateString
+		// Clear input
+		this.object.templateString = ""
+		//
 		name = name.trim()
 		name = name.replace(/ +(?= )/g, '');
 		this.validator.validateNonUser(name)
@@ -124,48 +181,63 @@ export class CreateFirstGroupComponent {
 		if (!this.validator.pass)
 			return
 
+		// No duplicates
+		for (let i = 0; i < this.object.templateGroup.simpleUsers.length; ++i) {
+			if (this.object.templateGroup.simpleUsers[i].name == this.object.templateString) {
+				this.validator.pass = false
+				this.validator.error.msg = "A user (without an attached account) with this name has already been added!"
+				return
+			}
+		}
+
 		// Add nonuser as a member
 		// this.object.templateGroup.users.push(User.NonUser()) or allow User | NonUser
 		this.object.templateGroup.simpleUsers.push(new SimpleUser(name, this.object.templateGroup.nextNonUserID()))
 
+		// Clear friend results
+		this.searchResult_friends = []
+
 		// Removes double white spaces
 		// *This informs future UI decisions and product vision - users and non users are not equal
-		this.object.templateString = ""
 	}
 
-	addMember__friend(): void {
+	addMember__friend(friend: number): void {
 		console.log(`Add Friend ${this.object.templateString}`)
-		// Get friend
-		// this.userService.searchFriends(this.user.id, this.object.templateString)
 
+		// Clear text
+		this.object.templateString = ""
+
+		// Find friend from friend ID
+		for (let i = 0; i < this.friends.length; ++i) {
+			if (this.friends[i].id == friend) {
+				this.object.templateFriend = this.friends[i]
+				break
+			}
+		}
+
+		// Validate friend
 		this.validator.validateUser(this.object.templateFriend)
 		if (!this.validator.pass) return
 
-		for (let i = 0; i < this.friends.length; ++i) {
-			// TODO change to contains, not equals
-			if (this.friends[i].name.includes(this.object.templateFriend.name)) {
-				this.object.templateFriend.id = this.friends[i].id
-				break
-			}
-
-			// Highlight part of name that matches?
-			// return number (+length)
-		}
-
-		// Create link
-		if (this.object.templateFriend.id == -1) {
-			console.log("Friend doesn't exist!") // UI feedback checks & Important console checks here. Main checks in service
-			// loggerService.logError("{this.currentUser} failed to add friend:({this.userToBeAdded.name}) into group:({this.currentGroup.name})")
-			return
-		}
-
-		if (!this.validator.pass)
-			return
-
 		// Add to template group only
-		this.object.templateGroup.users.push({ ...this.object.templateMember })
-		// OR let user2: User = Object.create(this.object.templateMember)
-		// this.groupService.addUser(this.object.templateGroup.id, this.object.templateMember.id)
+		this.object.templateGroup.users.push({ ...this.object.templateFriend })
+
+		// Clear friend results
+		this.searchResult_friends = []
+
+		// Re-fetch friends after (? Unsure if nec.)
+		this.initFriends()
+	}
+
+	addMember__userByEmail(): void {
+		console.log(`Add user by email ${this.object.templateString}`)
+
+		// Clear text
+		this.object.templateString = ""
+	}
+
+	addMember__userByFacebook(): void {
+		console.log(`Add user from facebook ${this.object.templateString}`)
 
 		// Clear text
 		this.object.templateString = ""
@@ -185,7 +257,7 @@ export class CreateFirstGroupComponent {
 
 	createGroup(): void {
 
-		if (this.object.templateGroup.users.length == 0) {
+		if (this.object.templateGroup.users.length + this.object.templateGroup.simpleUsers.length == 0) {
 			this.state = UIState.EmptyGroupDialogue
 			// or
 			this.launch__emptyGroupDialogue()
@@ -202,10 +274,12 @@ export class CreateFirstGroupComponent {
 
 	emptyGroupDialogue__Yes(): void {
 		console.log("EmptyGroup Dialogue: Reply: Yes")
+		this.state = UIState.Created
 	}
 
 	emptyGroupDialogue__No(): void {
 		console.log("EmptyGroup Dialogue: Reply: No")
+		this.state = UIState.AddMembers
 	}
 
 	// Filtering methods
@@ -215,6 +289,7 @@ export class CreateFirstGroupComponent {
 		this.to_filter = true // If to_filter set to false, stop current search
 		let filtered: User[] = []
 
+		// Get friends
 		for (let i = 0; i < this.friends.length; ++i) {
 			if (this.to_filter) {
 				this.to_filter = true
@@ -225,6 +300,8 @@ export class CreateFirstGroupComponent {
 				filtered.push({ ...this.friends[i] })
 			}
 		}
+
+		// Get user by email
 
 		return filtered
 	}
@@ -254,17 +331,28 @@ export class CreateFirstGroupComponent {
 		//Initialise
 		this.user.name = "Player"
 		this.user.id = 0
+
+		this.initUser()
+		this.initFriends()
 	}
 
 	initUser() {
-
+		this.user = new User(0, "Alice")
 	}
 
 	initFriends() {
 		this.userService.getFriends(this.user).subscribe(
-			friends => this.friends = friends)
+			friends => {
+				this.friends = friends
+			})
 	}
 	// #endregion Body
+
+	// #region Constants
+
+	EMAIL_REGEXP: RegExp = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+
+	// #endregion
 }
 
 // #region Structure
@@ -393,3 +481,4 @@ enum UIState {
 // Display error if somehow button is clicked
 // Display error from db if request goes through but still error
 // https://angular.io/guide/form-validation
+// Fix fake-server logic

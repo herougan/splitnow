@@ -15,8 +15,8 @@ import { Transaction } from '../../structures/transaction';
 })
 export class NewGroupFormComponent {
 
-	user: User = new User(0, "Castor Gin", []);
-	n_friends = this.user.friendIds;
+	user: User = new User(0, "Castor Gin");
+	// n_friends = this.user.friendIds;
 
 	activated = false;
 	activated__addPeople = false;

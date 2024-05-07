@@ -8,7 +8,8 @@
 			<div class="dashboard__group-new-form-label">What is your group's name?</div>
 			<div class="dashboard__friends-empty-add-new place-self-center">
 				<input type="text" class="form-control" id="name" required placeholder="Enter name..."
-					onforminput="newGroupCreateContext" [(ngModel)]="object.templateGroup.name" name="name">
+					onforminput="newGroupCreateContext" [(ngModel)]="object.templateGroup.name" name="name"
+					#enterGroupNameInput>
 				<div *ngIf="!validator.pass" class="dashboard__group-empty-new-form__two-input__warning input_warning">
 					{{
 					validator.error.msg }}</div>
@@ -36,9 +37,9 @@
 			<!-- Input -->
 			<input type="text" class="form-control dashboard__search_group-input" id="name" required
 				placeholder="Enter Group ID..." (keyup)="addMember__onInput" [(ngModel)]="object.templateMember.name"
-				name="name" #name="ngModel" #friendNameInput>
+				name="name" #name="ngModel" #joinGroupInput>
 			<!-- Cancel -->
-			<div (click)="cancelJoining" class="text-cyan-500 cyan-title mt-2">
+			<div (click)="cancelJoining()" class="text-cyan-500 cyan-title mt-2">
 				Back
 			</div>
 		</div>
@@ -47,37 +48,51 @@
 	<form #addMemberForm="ngForm" *ngIf="state == UIState.AddMembers">
 		<div class="dashboard__group-empty-new-form__two flex flex-col place-content-center items-center space-y-5">
 			<div class="dashboard__group-addMember__title"></div>
-			<div for="" class="dashboard__group-empty-new-form__two-label">Add the members of your group!</div>
+			<div class="dashboard__group-empty-new-form__two-label">Add the members of your group!</div>
 			<div class="place-self-center dashboard__group-empty-new-form-container" (focusout)="addMember__loseFocus()"
 				tabindex="-1"> <!-- flex flex-col -->
 				<!-- Input -->
 				<input type="text" class="form-control dashboard__group-empty-new-form__two-input" id="name" required
-					placeholder="Name or Email" (keyup)="addMember__onInput" [(ngModel)]="object.templateString"
+					placeholder="Name or Email" (keyup)="addMember__onInput()" [(ngModel)]="object.templateString"
 					name="name" #name="ngModel" #friendNameInput>
-				<div *ngIf="!validator.pass" class="dashboard__group-empty-new-form__two-input__warning">{{
-					validator.error.msg }}</div>
 				<!-- Context -->
 				<div class="dashboard__group-empty-new-form__two-context" [ngClass]="{'highlight': name.value}">
 					<!-- Search for friends -->
-					<div (click)="addMember__friend()" class="suggestion-row" *ngIf="name.value && name.value">
-						<p>Add Alice (friend)</p> <!-- Add friend-->
+					<!-- Create a non-user from name -->
+					<div (click)="addMember__nonUser()" class="suggestion-row"
+						*ngIf="name.value && addMember_nonUserNamePass">
+						<p>Add {{name.value}}</p>
 					</div>
-					<div (click)="addMember__nonUser()" class="suggestion-row" *ngIf="name.value">
-						<p>Add {{name.value}}</p> <!-- Add an empty user -->
-					</div>
-					<div (click)="addMember()" class="suggestion-row" *ngIf="name.value && name.value">
-						<p>Add {{name.value}} account</p> <!-- Add non-friend account -->
-					</div>
-					<div (click)="addMember()" class="suggestion-row" *ngIf="name.value && name.value">
-						<p>Facebook-Logo {{name.value}}</p> <!-- Add non-friend account -->
+					<!-- By Email, ID, or friend's name-->
+					<div *ngFor="let result of searchResult_friends; index as i" (click)="addMember__friend(result.id)"
+						class="suggestion-row">
+						<p class="text-sky-500">Add {{result.name}} - {{i}}</p>
 					</div>
 				</div>
-				<!-- Sing -->
+				<!-- Warning -->
+				<div *ngIf="!validator.pass"
+					class="dashboard__group-empty-new-form__two-input__warning input_warning mt-1">
+					{{
+					validator.error.msg }}</div>
 				<div>
+					<div id="tooltip-default" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700
+						dashboard__group-empty-new-form__two-tooltip">
+						Type their full IDs or their email address to add them in!
+						<div class="tooltip-arrow" data-popper-arrow></div>
+					</div> <!-- TODO SOMEHOW DOESNT WORK -->
+				</div>
+				<button data-tooltip-target="tooltip-default" type="button"
+					class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Default
+					tooltip</button>
 
+				<div id="tooltip-default" role="tooltip"
+					class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
+					Tooltip content
+					<div class="tooltip-arrow" data-popper-arrow></div>
 				</div>
 			</div>
-			<div class="text-cyan-500 cyan-title dashboard__group-empty-new-form__add-label">
+			<div data-tooltip-target="tooltip-default"
+				class="text-cyan-500 cyan-title dashboard__group-empty-new-form__add-label">
 				Add an existing user
 			</div>
 			<!-- <div>
@@ -91,41 +106,43 @@
 			<!-- Current Member List -->
 			<div class="dashboard__group-empty-new-form__member-list">
 				<!-- Users -->
-				<tr *ngFor="let member of object.templateGroup.users;let i = index">
-					<td>
-						<div id="member-{{i}}" class="member-row items-center px-1 flex place-content-between">
-							<ng-container *ngIf="member.id > -1">
-								<div class="member-row-text is_member user-link">{{member.name}}</div>
-								<!-- routerlink="" target="_blank"-->
-								<div id="member-del-{{i}}" class="member-row-del" (click)="removeMember(i)">
-								</div>
-							</ng-container>
-							<ng-template #non_user>
-								<div class="member-row-text">{{member.name}}</div>
-								<div id="member-del-{{i}}" class="member-row-del" (click)="removeMember(i)">
-								</div>
-							</ng-template>
-						</div>
-					</td>
-				</tr>
-				<!-- SimpleUser -->
-				<tr *ngFor="let member of object.templateGroup.simpleUsers;let i = index">
-					<td>
-						<div id="member-{{i}}" class="member-row items-center px-1 flex place-content-between">
-							<ng-container *ngIf="member.tempId > -1">
-								<div class="member-row-text is_member user-link">{{member.name}}</div>
-								<!-- routerlink="" target="_blank"-->
-								<div id="member-del-{{i}}" class="member-row-del" (click)="removeMember(i)">
-								</div>
-							</ng-container>
-							<ng-template #non_user>
-								<div class="member-row-text">{{member.name}}</div>
-								<div id="member-del-{{i}}" class="member-row-del" (click)="removeMember(i)">
-								</div>
-							</ng-template>
-						</div>
-					</td>
-				</tr>
+				<tbody>
+					<tr *ngFor="let member of object.templateGroup.users;let i = index">
+						<td>
+							<div id="member-{{i}}" class="member-row items-center px-1 flex place-content-between">
+								<ng-container *ngIf="member.id > -1">
+									<div class="member-row-text is_member user-link">{{member.name}}</div>
+									<!-- routerlink="" target="_blank"-->
+									<div id="member-del-{{i}}" class="member-row-del" (click)="removeMember(i)">
+									</div>
+								</ng-container>
+								<ng-template #non_user>
+									<div class="member-row-text">{{member.name}}</div>
+									<div id="member-del-{{i}}" class="member-row-del" (click)="removeMember(i)">
+									</div>
+								</ng-template>
+							</div>
+						</td>
+					</tr>
+					<!-- SimpleUser -->
+					<tr *ngFor="let member of object.templateGroup.simpleUsers;let i = index">
+						<td>
+							<div id="member-{{i}}" class="member-row items-center px-1 flex place-content-between">
+								<ng-container *ngIf="member.tempId > -1">
+									<div class="member-row-text is_member user-link">{{member.name}}</div>
+									<!-- routerlink="" target="_blank"-->
+									<div id="member-del-{{i}}" class="member-row-del" (click)="removeMember(i)">
+									</div>
+								</ng-container>
+								<ng-template #non_user>
+									<div class="member-row-text">{{member.name}}</div>
+									<div id="member-del-{{i}}" class="member-row-del" (click)="removeMember(i)">
+									</div>
+								</ng-template>
+							</div>
+						</td>
+					</tr>
+				</tbody>
 			</div>
 			<div class="dashboard__group-empty-new-form__two-context flex flex-col place-items-center">
 
@@ -165,7 +182,6 @@
 			<button></button>
 		</div>
 	</form>
-
 	<!-- Error Dialogue -->
 	<form #errorDialogue="ngForm" class="error_dialouge">
 

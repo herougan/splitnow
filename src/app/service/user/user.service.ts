@@ -11,6 +11,8 @@ import { FRIENDSHIPS, GROUPS, USERS } from '../../../assets/static/test/data_one
 })
 export class UserService {
 
+	// Note the logic in actuality should be stored on the server
+
 	tempUsers: User[] = []
 	tempFriendships: [number, number][] = []
 
@@ -74,6 +76,22 @@ export class UserService {
 	}
 
 	// Get
+	getUser(id: number): Observable<User> {
+		for (let i = 0; i < this.tempUsers.length; ++i) {
+			if (this.tempUsers[i].id == id) return of(this.tempUsers[i])
+		}
+
+		return of(User.Empty())
+	}
+
+	server__getUser(id: number): User {
+		for (let i = 0; i < this.tempUsers.length; ++i) {
+			if (this.tempUsers[i].id == id) return this.tempUsers[i]
+		}
+
+		return User.Empty()
+	}
+
 	getGroups(): Observable<Group[]> {
 		let groups: Group[] = [
 			new Group(0, "Group 1",
@@ -87,11 +105,14 @@ export class UserService {
 	}
 
 	getFriends(user: User): Observable<User[]> {
-		const friends: User[] = [
-			new User(-1, 'AliceFriend'),
-			new User(-1, 'BobFriend'),
-			new User(-1, 'CharlieFriend'),
-		]
+		let friends: User[] = []
+		let _user: User = User.Empty()
+		for (let i = 0; i < this.tempFriendships.length; ++i) {
+			if (this.tempFriendships[i][0] == user.id) {
+				_user = this.server__getUser(this.tempFriendships[i][1])
+				if (_user.id > 0) friends.push(_user)
+			}
+		}
 
 		return of(friends)
 	}
@@ -100,6 +121,28 @@ export class UserService {
 		const friends: User[] = []
 
 		return of(friends)
+	}
+
+	searchByID(id: number): Observable<User> {
+
+		for (let i = 0; i < this.tempUsers.length; ++i) {
+			if (this.tempUsers[i].id == id) {
+				return of(this.tempUsers[i])
+			}
+		}
+
+		return of(User.Empty())
+	}
+
+	searchByEmail(email: string): Observable<User> {
+
+		for (let i = 0; i < this.tempUsers.length; ++i) {
+			if (this.tempUsers[i].email == email) {
+				return of(this.tempUsers[i])
+			}
+		}
+
+		return of(User.Empty())
 	}
 
 	getFriendsLimit(user: User, limit: Number, page: Number = 0): Observable<User[]> {
