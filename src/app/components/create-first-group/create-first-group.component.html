@@ -8,8 +8,7 @@
 			<div class="dashboard__group-new-form-label">What is your group's name?</div>
 			<div class="dashboard__friends-empty-add-new place-self-center">
 				<input type="text" class="form-control" id="name" required placeholder="Enter name..."
-					onforminput="newGroupCreateContext" [(ngModel)]="object.templateGroup.name" name="name"
-					#enterGroupNameInput>
+					[(ngModel)]="object.templateGroup.name" name="name" #enterGroupNameInput>
 				<div *ngIf="!validator.pass" class="dashboard__group-empty-new-form__two-input__warning input_warning">
 					{{
 					validator.error.msg }}</div>
@@ -48,6 +47,7 @@
 	<form #addMemberForm="ngForm" *ngIf="state == UIState.AddMembers">
 		<div class="dashboard__group-empty-new-form__two flex flex-col place-content-center items-center space-y-5">
 			<div class="dashboard__group-addMember__title"></div>
+			<div class="dashboard__group-empty-new-form__two-label">{{object.templateGroup.name}}</div>
 			<div class="dashboard__group-empty-new-form__two-label">Add the members of your group!</div>
 			<div class="place-self-center dashboard__group-empty-new-form-container" (focusout)="addMember__loseFocus()"
 				tabindex="-1"> <!-- flex flex-col -->
@@ -74,26 +74,6 @@
 					class="dashboard__group-empty-new-form__two-input__warning input_warning mt-1">
 					{{
 					validator.error.msg }}</div>
-				<div>
-					<div id="tooltip-default" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700
-						dashboard__group-empty-new-form__two-tooltip">
-						Type their full IDs or their email address to add them in!
-						<div class="tooltip-arrow" data-popper-arrow></div>
-					</div> <!-- TODO SOMEHOW DOESNT WORK -->
-				</div>
-				<button data-tooltip-target="tooltip-default" type="button"
-					class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Default
-					tooltip</button>
-
-				<div id="tooltip-default" role="tooltip"
-					class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
-					Tooltip content
-					<div class="tooltip-arrow" data-popper-arrow></div>
-				</div>
-			</div>
-			<div data-tooltip-target="tooltip-default"
-				class="text-cyan-500 cyan-title dashboard__group-empty-new-form__add-label">
-				Add an existing user
 			</div>
 			<!-- <div>
 			Invite users from facebook!
@@ -111,16 +91,11 @@
 						<td>
 							<div id="member-{{i}}" class="member-row items-center px-1 flex place-content-between">
 								<ng-container *ngIf="member.id > -1">
-									<div class="member-row-text is_member user-link">{{member.name}}</div>
+									<div class="member-row-text is_member user-link">{{member.name}} {{i}}</div>
 									<!-- routerlink="" target="_blank"-->
 									<div id="member-del-{{i}}" class="member-row-del" (click)="removeMember(i)">
 									</div>
 								</ng-container>
-								<ng-template #non_user>
-									<div class="member-row-text">{{member.name}}</div>
-									<div id="member-del-{{i}}" class="member-row-del" (click)="removeMember(i)">
-									</div>
-								</ng-template>
 							</div>
 						</td>
 					</tr>
@@ -131,22 +106,15 @@
 								<ng-container *ngIf="member.tempId > -1">
 									<div class="member-row-text is_member user-link">{{member.name}}</div>
 									<!-- routerlink="" target="_blank"-->
-									<div id="member-del-{{i}}" class="member-row-del" (click)="removeMember(i)">
+									<div id="member-del-{{i}}" class="member-row-del" (click)="removeNonUser(i)">
 									</div>
 								</ng-container>
-								<ng-template #non_user>
-									<div class="member-row-text">{{member.name}}</div>
-									<div id="member-del-{{i}}" class="member-row-del" (click)="removeMember(i)">
-									</div>
-								</ng-template>
 							</div>
 						</td>
 					</tr>
 				</tbody>
 			</div>
-			<div class="dashboard__group-empty-new-form__two-context flex flex-col place-items-center">
-
-			</div>
+			<!-- Create group button -->
 			<div>
 				<button (click)="createGroup()" type="submit"
 					class="bg-cyan-500 rounded py-2 px-3 text-white cyan-button">
@@ -177,9 +145,37 @@
 	<form #groupCreatedDialogue="ngForm" class="dashboard__group-create-success">
 		<div *ngIf="state == UIState.Created">
 			Congratulations! Your group has been created!
+			{{ object.templateGroup | json}}
 		</div>
 		<div>
-			<button></button>
+			<div class="dashboard__group-empty-new-form__member-list">
+				<!-- Users -->
+				<tr *ngFor="let member of object.templateGroup.users;let i = index">
+					<td>
+						<div id="member-{{i}}" class="member-row items-center px-1 flex place-content-between">
+							<ng-container *ngIf="member.id > -1">
+								<div class="member-row-text is_member user-link">{{member.name}} {{i}}</div>
+								<!-- routerlink="" target="_blank"-->
+								<div id="member-del-{{i}}" class="member-row-del" (click)="removeMember(i)">
+								</div>
+							</ng-container>
+						</div>
+					</td>
+				</tr>
+				<!-- SimpleUser -->
+				<tr *ngFor="let member of object.templateGroup.simpleUsers;let i = index">
+					<td>
+						<div id="member-{{i}}" class="member-row items-center px-1 flex place-content-between">
+							<ng-container *ngIf="member.tempId > -1">
+								<div class="member-row-text is_member user-link">{{member.name}}</div>
+								<!-- routerlink="" target="_blank"-->
+								<div id="member-del-{{i}}" class="member-row-del" (click)="removeNonUser(i)">
+								</div>
+							</ng-container>
+						</div>
+					</td>
+				</tr>
+			</div>
 		</div>
 	</form>
 	<!-- Error Dialogue -->

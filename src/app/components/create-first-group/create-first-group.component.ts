@@ -56,6 +56,7 @@ export class CreateFirstGroupComponent {
 			No API calls made
 		*/
 		this.state = UIState.AddMembers
+		this.object.templateGroup.users.push(this.user)
 		setTimeout(() => {
 			this.friendNameInputElement.nativeElement.focus()
 		}, 50)
@@ -127,18 +128,24 @@ export class CreateFirstGroupComponent {
 			let lowerCase = this.object.templateString.toLowerCase()
 			for (let i = 0; i < this.friends.length; ++i) {
 				if (this.friends[i].name.toLowerCase().includes(lowerCase)) {
-					this.searchResult_friends.push(this.friends[i])
-
 					// Check if already
 					for (let i = 0; i < this.object.templateGroup.users.length; ++i) {
-						if (this.object.templateGroup.users[i]) { }
+						if (this.object.templateGroup.users[i]) {
+							// TODO
+						}
 					}
 					//
+					this.searchResult_friends.push(this.friends[i])
 				}
 			}
 
 			// Search by ID
 			if (!isNaN(+this.object.templateString)) {
+				// Check if already added
+				{
+
+				}
+
 				this.userService.searchByID(+this.object.templateString).subscribe((user: User) => {
 					if (user.id < 0) return
 					for (let i = 0; i < this.searchResult_friends.length; ++i) {
@@ -151,6 +158,11 @@ export class CreateFirstGroupComponent {
 			// Search by email
 			// Check if fits pattern:
 			if (this.object.templateString.toLowerCase().match(this.EMAIL_REGEXP)) {
+				// Check if already added
+				{
+
+				}
+
 				this.userService.searchByEmail(this.object.templateString).subscribe((user: User) => {
 					if (user.id < 0) return
 					for (let i = 0; i < this.searchResult_friends.length; ++i) {
@@ -182,12 +194,10 @@ export class CreateFirstGroupComponent {
 			return
 
 		// No duplicates
-		for (let i = 0; i < this.object.templateGroup.simpleUsers.length; ++i) {
-			if (this.object.templateGroup.simpleUsers[i].name == this.object.templateString) {
-				this.validator.pass = false
-				this.validator.error.msg = "A user (without an attached account) with this name has already been added!"
-				return
-			}
+		if (this.object.templateGroup.simpleUsers.findIndex((x) => x.name.toLowerCase() === name.toLowerCase()) !== -1) {
+			this.validator.pass = false
+			this.validator.error.msg = "A user (without an attached account) with this name has already been added!"
+			return
 		}
 
 		// Add nonuser as a member
@@ -206,6 +216,16 @@ export class CreateFirstGroupComponent {
 
 		// Clear text
 		this.object.templateString = ""
+		this.addMember__onInput()
+
+		// Find if already added
+		for (let i = 0; i < this.object.templateGroup.users.length; ++i) {
+			if (this.object.templateGroup.users[i].id == friend) {
+				this.validator.pass = false
+				this.validator.error.msg = "User already added!"
+				return
+			}
+		}
 
 		// Find friend from friend ID
 		for (let i = 0; i < this.friends.length; ++i) {
@@ -251,6 +271,14 @@ export class CreateFirstGroupComponent {
 		}
 	}
 
+	removeNonUser(index: number): void {
+		console.log(`Remove Non User @${index}`)
+
+		if (index < this.object.templateGroup.simpleUsers.length) {
+			this.object.templateGroup.simpleUsers.splice(index, 1);
+		}
+	}
+
 	removeMember__nonUser(index: number): void {
 
 	}
@@ -274,6 +302,11 @@ export class CreateFirstGroupComponent {
 
 	emptyGroupDialogue__Yes(): void {
 		console.log("EmptyGroup Dialogue: Reply: Yes")
+		// if (simplerUser)
+		// this.object.templateGroup.simpleUsers.push(this.user)
+		// if (user)
+		this.object.templateGroup.users.push(this.user)
+		// 
 		this.state = UIState.Created
 	}
 
@@ -329,15 +362,13 @@ export class CreateFirstGroupComponent {
 
 	constructor(private userService: UserService, private groupService: GroupService) {
 		//Initialise
-		this.user.name = "Player"
-		this.user.id = 0
 
 		this.initUser()
 		this.initFriends()
 	}
 
 	initUser() {
-		this.user = new User(0, "Alice")
+		this.user = User.TestPlayer()
 	}
 
 	initFriends() {

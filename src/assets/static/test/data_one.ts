@@ -50,4 +50,6 @@ export const FRIENDSHIPS: [number, number][] = [
 	[0, 15],
 	[0, 20],
 	[0, 25],
+	[100, 0],
+	[100, 26],
 ]

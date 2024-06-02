@@ -110,7 +110,11 @@ export class UserService {
 		for (let i = 0; i < this.tempFriendships.length; ++i) {
 			if (this.tempFriendships[i][0] == user.id) {
 				_user = this.server__getUser(this.tempFriendships[i][1])
-				if (_user.id > 0) friends.push(_user)
+				if (_user && _user.id !== -1) friends.push(_user)
+			}
+			if (this.tempFriendships[i][1] == user.id) {
+				_user = this.server__getUser(this.tempFriendships[i][0])
+				if (_user && _user.id !== -1) friends.push(_user)
 			}
 		}
 

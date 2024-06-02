@@ -24,6 +24,11 @@ export class User {
 	static Empty(): User {
 		return new User(-1, "")
 	}
+
+	static TestPlayer(): User {
+		return new User(100, "Hamselle")
+	}
+
 }
 
 export class SimpleUser {
